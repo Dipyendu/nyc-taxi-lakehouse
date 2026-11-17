@@ -1,0 +1,2 @@
+# Source file as published by TLC, with CRLF line ends: keep it byte-identical, never normalise.
+dbt/seeds/taxi_zone_lookup.csv -text

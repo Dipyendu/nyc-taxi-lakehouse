@@ -1,0 +1,23 @@
+# SUPERSEDED by docs/evidence/mermaid-render-2026-11-17.txt (current labels of all diagrams); kept because it records the first, invalid check and its correction.
+# Mermaid render check of both diagrams, 2026-11-17 08:38 IST
+Method: each diagram's source, read from the file, was opened in the public Mermaid Live viewer
+(https://mermaid.live/view#base64:..., standard base64; the diagram travels in the URL fragment), the page was
+reloaded, and the rendered SVG was inspected with JavaScript in the browser pane.
+
+A first attempt with URL-safe base64 showed the viewer's own "Loading URL failed" chart (8 nodes, labels
+"Decode JSON", "Yes", "No :("); a check that counted nodes and edges only would have passed it. The checks below
+therefore require the diagram's own node texts and edge labels.
+
+## README.md
+nodes 8: TLC monthly Parquet | ingest (laptop or Airflow) | Unity Catalog volume + JSON manifest | bronze Delta table |
+silver trips | quarantine | gold: 5 dimensions... | Airflow DAG taxi_monthly
+edges 10 (source has 10 links); edge labels: serverless job taxi_bronze | serverless job taxi_silver | dbt build on SQL warehouse
+error text on page: none
+
+## docs/architecture.md
+nodes 10 (yellow_tripdata_YYYY-MM.parquet, taxi_zone_lookup.csv, taxi.ingest, UC volume, taxi_bronze.yellow_trips,
+taxi_bronze.ingest_manifest, taxi_silver.yellow_trips, taxi_silver.yellow_trips_quarantine, taxi_gold (dbt), Airflow DAG)
+subgraphs 3: NYC TLC (public CloudFront) | Laptop / Airflow container | Databricks Free Edition (serverless)
+edges 13 (source has 13 links); edge labels: dbt seed | job taxi_bronze (PySpark) | job taxi_silver (PySpark) |
+dbt build (SQL warehouse) | reconciliation test | orchestrates | Jobs API | Jobs API | dbt
+error text on page: none

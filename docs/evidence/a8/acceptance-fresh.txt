@@ -1,0 +1,48 @@
+# Review fixes fresh acceptance checks after the review fixes, 2026-11-17 08:39:21 IST
+Checks 2, 3, 5 and 6 ran fresh this morning: a8/b1-scheduled-run-2026-07.txt (2, 6), a8/dbt-fixes-fresh-build.txt (3, 5).
+
+## 1. make ci
+All checks passed!
+61 passed, 1 skipped in 3.10s
+make ci exit=0
+
+## 3 and 4 (warehouse), calendar fix calendar, gross amounts mart columns
+LEDGER: start 2026-11-17 08:39:30, limit 300 s: review fixes fresh checks 3, 4, calendar fix, gross amounts
+> WITH b AS (SELECT file_month, count(*) n FROM analytics.taxi_bronze.yellow_trips GROUP BY 1), s AS (SELECT file_month, count(*) n FROM analytics.taxi_silver.yellow_trips GROUP BY 1), q AS (SELECT file_month, count(*) n FROM analytics.taxi_silver.yellow_trips_quarantine GROUP BY 1), f AS (SELECT file_month, count(*) n FROM analytics.taxi_gold.fct_trips GROUP BY 1) SELECT count(*) AS months, sum(CASE WHEN m.rows = b.n AND b.n = s.n + coalesce(q.n,0) AND f.n = s.n THEN 1 ELSE 0 END) AS months_reconciling, sum(m.rows) AS metadata_rows, sum(b.n) AS bronze, sum(s.n) AS silver, sum(q.n) AS quarantine, sum(f.n) AS fact FROM analytics.taxi_bronze.ingest_manifest m LEFT JOIN b USING (file_month) LEFT JOIN s USING (file_month) LEFT JOIN q USING (file_month) LEFT JOIN f USING (file_month)
+  months | months_reconciling | metadata_rows | bronze | silver | quarantine | fact
+  33 | 33 | 123471721 | 123471721 | 119698837 | 3772884 | 119698837
+> SELECT file_month, count(cbd_congestion_fee) AS cbd_fee_non_null, count(*) AS rows FROM analytics.taxi_bronze.yellow_trips WHERE file_month IN ('2024-12','2025-01') GROUP BY 1 ORDER BY 1
+  file_month | cbd_fee_non_null | rows
+  2024-12 | 0 | 3668371
+  2025-01 | 3475226 | 3475226
+> SELECT min(date_day) AS first_day, max(date_day) AS last_day, count(*) AS days FROM analytics.taxi_gold.dim_date
+  first_day | last_day | days
+  2024-01-01 | 2027-12-31 | 1461
+> SELECT column_name FROM analytics.information_schema.columns WHERE table_schema = 'taxi_gold' AND table_name IN ('mart_daily_zone_demand', 'mart_hourly_demand') AND column_name LIKE '%gross%' ORDER BY 1
+  column_name
+  avg_gross_total_amount
+  gross_total_amount
+
+## 7. every Databricks job run is in the ledger (re-run listing this project's taxi_* jobs only)
+Jobs API: taxi_silver runs=36 success=36
+Jobs API: taxi_bronze runs=36 success=36
+ledger rows for job runs: bronze=36 silver=36
+
+## 8. README numbers name their evidence; EXPLAIN complete
+README result rows: 15; without an evidence file: 0 []
+evidence paths cited in README and EXPLAIN: 17; missing on disk: []
+  Ingest: what=True why=True rejected=True at10x=True
+  Bronze: what=True why=True rejected=True at10x=True
+  Silver: what=True why=True rejected=True at10x=True
+  Gold: what=True why=True rejected=True at10x=True
+  Orchestration: what=True why=True rejected=True at10x=True
+  Databricks jobs: what=True why=True rejected=True at10x=True
+  Operations: what=True why=True rejected=True at10x=True
+interview questions: 12
+
+## 9. secret scan with a fresh plant
+SECRET-SCAN HIT: databricks-pat in planted_a8.txt
+SECRET-SCAN: FAIL (1 hit(s), all files)
+with plant exit=1
+SECRET-SCAN: CLEAN (all files)
+without plant exit=0

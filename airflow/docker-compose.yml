@@ -1,0 +1,79 @@
+# Lean local Airflow: Postgres + one container running the scheduler, API server and
+# DAG processor with LocalExecutor. Run with the fixed project name:
+#   docker compose -p taxi -f airflow/docker-compose.yml up -d
+# Memory limits: 1,536 MiB for Airflow (measured peak 1,207 MiB) and 256 MiB for Postgres.
+name: taxi
+
+services:
+  postgres:
+    image: postgres:16.14-alpine
+    mem_limit: 256m
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow   # local-only metadata DB, not reachable from outside the compose network
+      POSTGRES_DB: airflow
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+
+  airflow:
+    build:
+      context: ..
+      dockerfile: airflow/Dockerfile
+    image: taxi-airflow:3.3.2
+    # Only the parts this DAG needs, in one container. `airflow standalone` also starts a triggerer
+    # and a supervisor; measured idle at 1.02 GiB with them, so they are left out.
+    command:
+      - bash
+      - -c
+      - airflow db migrate && (airflow dag-processor &) && (airflow api-server --workers 1 &) && exec airflow scheduler
+    mem_limit: 1536m
+    # The API server and DAG processor run in the background of one container, so the healthcheck
+    # covers all three: it fails unless the API answers and reports scheduler and DAG processor healthy.
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          curl -fsS --max-time 5 http://localhost:8080/api/v2/monitor/health |
+          python -c 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if all(d[k]["status"]=="healthy" for k in ("metadatabase","scheduler","dag_processor")) else 1)'
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      # DATABRICKS_HOST and DATABRICKS_TOKEN; default: .secrets.env next to the repository folder
+      - ${TAXI_SECRETS_FILE:-../../.secrets.env}
+      # TAXI_WAREHOUSE_HTTP_PATH (copy local.env.example to local.env)
+      - ../local.env
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/taxi/airflow/dags
+      AIRFLOW__CORE__PARALLELISM: "1"
+      AIRFLOW__API__WORKERS: "1"
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS: "true"   # local demo only: no login
+      TZ: Asia/Kolkata   # run-ledger times are IST, like the host
+      PYTHONUNBUFFERED: "1"
+      LEDGER_LIMIT_S: "1440"   # 24 min, under the 25-minute task limit, so the ledger records a timeout first
+      TAXI_DATA_DIR: /opt/taxi/data
+      TAXI_RUN_LEDGER: /opt/taxi/docs/run-ledger.md
+      TAXI_QUOTA_LOG: ${TAXI_QUOTA_LOG_FILE:+/opt/quota/QUOTA.log}   # empty (guard off) unless TAXI_QUOTA_LOG_FILE is set
+    volumes:
+      # The repository is mounted read-write on purpose: runs append to docs/run-ledger.md and download to data/.
+      - ..:/opt/taxi
+      # Optional quota log shared with other projects on the same Databricks account (scripts/ledger.sh
+      # refuses to start while it ends with a QUOTA-STOP line). Unset: an empty volume, and the guard is off.
+      - ${TAXI_QUOTA_LOG_FILE:-quota_off}:/opt/quota/QUOTA.log:ro
+    ports:
+      - "127.0.0.1:8080:8080"
+
+volumes:
+  pgdata:
+  quota_off:

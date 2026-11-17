@@ -1,0 +1,7 @@
+# Ingest retries code and the relative secrets path through make, 2026-11-17 08:43:55 IST
+$ make ingest MONTH=2026-07
+LEDGER: start 2026-11-17 08:43:55, limit 1800 s: make ingest 2026-07 (download + volume upload)
+{"month": "2026-07", "status": "skipped"}
+exit=0 (exit status of the whole pipeline without pipefail; the JSON line above is printed only on the success path)
+$ make -n deploy (secret variable names masked)
+set -a; . ../.secrets.env; set +a; export <masked>; scripts/ledger.sh "make deploy" "bundle files" databricks bundle deploy --var landing_root=/Volumes/analytics/taxi_landing/raw

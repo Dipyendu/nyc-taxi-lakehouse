@@ -1,0 +1,23 @@
+# No secrets here: host and token come from the environment (DATABRICKS_HOST, DATABRICKS_TOKEN).
+taxi:
+  target: dev
+  outputs:
+    dev:
+      type: databricks
+      catalog: "{{ env_var('TAXI_CATALOG', 'analytics') }}"
+      schema: taxi_gold
+      host: "{{ env_var('DATABRICKS_HOST').split('?')[0] | replace('https://', '') | trim('/') }}"
+      http_path: "{{ env_var('TAXI_WAREHOUSE_HTTP_PATH') }}"   # from local.env (see local.env.example)
+      token: "{{ env_var('DATABRICKS_TOKEN') }}"
+      threads: 4
+      connect_retries: 3
+      connect_timeout: 30
+    # Offline target for `dbt parse` in CI: no connection is opened.
+    ci:
+      type: databricks
+      catalog: analytics
+      schema: taxi_gold
+      host: example.cloud.databricks.com
+      http_path: /sql/1.0/warehouses/ci
+      token: ci-placeholder
+      threads: 1

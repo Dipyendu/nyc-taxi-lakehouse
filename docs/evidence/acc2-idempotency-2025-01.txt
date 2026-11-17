@@ -1,0 +1,46 @@
+# Acceptance 2: load 2025-01 twice; counts and content checksum must not change
+## BEFORE reload, 2026-11-16 20:20:23 IST
+> SELECT 'bronze' AS layer, count(*) AS rows, sum(cast(xxhash64(`VendorID`, `tpep_pickup_datetime`, `tpep_dropoff_datetime`, `passenger_count`, `trip_distance`, `RatecodeID`, `store_and_fwd_flag`, `PULocationID`, `DOLocationID`, `payment_type`, `fare_amount`, `extra`, `mta_tax`, `tip_amount`, `tolls_amount`, `improvement_surcharge`, `total_amount`, `congestion_surcharge`, `Airport_fee`, `cbd_congestion_fee`, `_source_file`, `_source_row`, `file_month`) AS DECIMAL(38,0))) AS checksum FROM analytics.taxi_bronze.yellow_trips WHERE file_month = '2025-01'
+  layer | rows | checksum
+  bronze | 3475226 | 714313153372332490277
+> SELECT 'fact' AS layer, count(*) AS rows, sum(cast(xxhash64(*) AS DECIMAL(38,0))) AS checksum FROM analytics.taxi_gold.fct_trips WHERE file_month = '2025-01'
+  layer | rows | checksum
+  fact | 3330526 | 9469482399475048467011
+
+## RELOAD: make run MONTH=2025-01, 2026-11-16 20:20:38 IST
+{"month": "2025-01", "status": "skipped"}
+taxi_bronze month=2025-01 run_id=655571756063883 result=SUCCESS url=<workspace-url>#job/610188567750162/run/655571756063883
+taxi_silver month=2025-01 run_id=201437856202848 result=SUCCESS url=<workspace-url>#job/817405865672281/run/201437856202848
+14:51:58  2 of 47 OK created sql view model taxi_gold.stg_trips .......................... [OK in 2.48s]
+14:51:59  1 of 47 OK created sql table model taxi_gold.dim_date .......................... [OK in 3.67s]
+14:52:03  14 of 47 START sql incremental model taxi_gold.fct_trips ....................... [RUN]
+14:52:04  9 of 47 OK created sql table model taxi_gold.dim_payment_type .................. [OK in 3.44s]
+14:52:06  12 of 47 OK created sql table model taxi_gold.dim_ratecode ..................... [OK in 3.33s]
+14:52:07  13 of 47 OK created sql table model taxi_gold.dim_vendor ....................... [OK in 3.50s]
+14:52:08  15 of 47 OK created sql table model taxi_gold.dim_zone ......................... [OK in 3.42s]
+14:52:13  14 of 47 OK created sql incremental model taxi_gold.fct_trips .................. [OK in 9.67s]
+14:52:15  28 of 47 START test not_null_fct_trips_file_month .............................. [RUN]
+14:52:17  28 of 47 PASS not_null_fct_trips_file_month .................................... [PASS in 1.89s]
+14:52:27  43 of 47 OK created sql table model taxi_gold.mart_hourly_demand ............... [OK in 3.93s]
+14:52:27  42 of 47 OK created sql table model taxi_gold.mart_daily_zone_demand ........... [OK in 4.02s]
+14:52:29  Finished running 1 incremental model, 4 seeds, 7 table models, 34 data tests, 1 view model in 0 hours 0 minutes and 40.64 seconds (40.64s).
+14:52:29  Completed successfully
+14:52:29  Done. PASS=47 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=47
+14:52:41  1 of 1 START test reconcile_months ............................................. [RUN]
+14:52:43  1 of 1 PASS reconcile_months ................................................... [PASS in 2.41s]
+14:52:43  Completed successfully
+14:52:43  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=1
+make run exit= (not captured: the shell is zsh, which has no PIPESTATUS; make stops at the first failing step, and its last step printed "Completed successfully")
+
+## AFTER reload, 2026-11-16 20:22:53 IST
+> SELECT 'bronze' AS layer, count(*) AS rows, sum(cast(xxhash64(`VendorID`, `tpep_pickup_datetime`, `tpep_dropoff_datetime`, `passenger_count`, `trip_distance`, `RatecodeID`, `store_and_fwd_flag`, `PULocationID`, `DOLocationID`, `payment_type`, `fare_amount`, `extra`, `mta_tax`, `tip_amount`, `tolls_amount`, `improvement_surcharge`, `total_amount`, `congestion_surcharge`, `Airport_fee`, `cbd_congestion_fee`, `_source_file`, `_source_row`, `file_month`) AS DECIMAL(38,0))) AS checksum FROM analytics.taxi_bronze.yellow_trips WHERE file_month = '2025-01'
+  layer | rows | checksum
+  bronze | 3475226 | 714313153372332490277
+> SELECT 'fact' AS layer, count(*) AS rows, sum(cast(xxhash64(*) AS DECIMAL(38,0))) AS checksum FROM analytics.taxi_gold.fct_trips WHERE file_month = '2025-01'
+  layer | rows | checksum
+  fact | 3330526 | 9469482399475048467011
+
+## CONTROL: the same fact checksum with one row left out must differ, 2026-11-16 20:23:09 IST
+> SELECT 'fact minus 1 row' AS layer, count(*) AS rows, sum(cast(xxhash64(*) AS DECIMAL(38,0))) AS checksum FROM analytics.taxi_gold.fct_trips WHERE file_month = '2025-01' AND trip_id <> '2025-01-0'
+  layer | rows | checksum
+  fact minus 1 row | 3330525 | 9463871980131864749860

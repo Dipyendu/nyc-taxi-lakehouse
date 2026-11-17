@@ -1,0 +1,83 @@
+# Bronze and silver: bronze + silver on 2024-12 and 2025-01, checked 2026-11-16 20:17:41 IST
+> SELECT m.file_month, m.rows AS parquet_metadata_rows, b.n AS bronze_rows, s.n AS silver_rows, q.n AS quarantine_rows, b.n = s.n + q.n AND m.rows = b.n AS reconciles FROM analytics.taxi_bronze.ingest_manifest m JOIN (SELECT file_month, count(*) n FROM analytics.taxi_bronze.yellow_trips GROUP BY 1) b USING (file_month) JOIN (SELECT file_month, count(*) n FROM analytics.taxi_silver.yellow_trips GROUP BY 1) s USING (file_month) JOIN (SELECT file_month, count(*) n FROM analytics.taxi_silver.yellow_trips_quarantine GROUP BY 1) q USING (file_month) ORDER BY 1
+  file_month | parquet_metadata_rows | bronze_rows | silver_rows | quarantine_rows | reconciles
+  2024-12 | 3668371 | 3668371 | 3589120 | 79251 | true
+  2025-01 | 3475226 | 3475226 | 3330526 | 144700 | true
+> SELECT file_month, rule, count(*) AS rows FROM analytics.taxi_silver.yellow_trips_quarantine GROUP BY 1, 2 ORDER BY 1, 3 DESC
+  file_month | rule | rows
+  2024-12 | negative_fare_or_total | 79017
+  2024-12 | dropoff_before_pickup | 99
+  2024-12 | trip_distance_over_500mi | 83
+  2024-12 | pickup_outside_file_month | 34
+  2024-12 | duration_over_24h | 18
+  2025-01 | negative_fare_or_total | 144416
+  2025-01 | dropoff_before_pickup | 124
+  2025-01 | trip_distance_over_500mi | 118
+  2025-01 | pickup_outside_file_month | 22
+  2025-01 | duration_over_24h | 20
+> SELECT file_month, count(cbd_congestion_fee) AS cbd_fee_non_null, count(*) AS rows, count(request_source) AS request_source_non_null FROM analytics.taxi_bronze.yellow_trips GROUP BY 1 ORDER BY 1
+  FAILED: [UNRESOLVED_COLUMN.WITH_SUGGESTION] A column, variable, or function parameter with name `request_source` cannot be resolved. Did you mean one of the following? [`extra`, `fare_amount`, `file_month`, `tolls_amount`, `VendorID`]. SQLSTATE: 42703; line 1 pos 90
+> SELECT column_name, data_type FROM analytics.information_schema.columns WHERE table_schema='taxi_bronze' AND table_name='yellow_trips' ORDER BY ordinal_position
+  column_name | data_type
+  VendorID | INT
+  tpep_pickup_datetime | TIMESTAMP_NTZ
+  tpep_dropoff_datetime | TIMESTAMP_NTZ
+  passenger_count | LONG
+  trip_distance | DOUBLE
+  RatecodeID | LONG
+  store_and_fwd_flag | STRING
+  PULocationID | INT
+  DOLocationID | INT
+  payment_type | LONG
+  fare_amount | DOUBLE
+  extra | DOUBLE
+  mta_tax | DOUBLE
+  tip_amount | DOUBLE
+  tolls_amount | DOUBLE
+  improvement_surcharge | DOUBLE
+  total_amount | DOUBLE
+  congestion_surcharge | DOUBLE
+  Airport_fee | DOUBLE
+  cbd_congestion_fee | DOUBLE
+  _source_file | STRING
+  _source_row | LONG
+  _load_ts | TIMESTAMP
+  file_month | STRING
+> SELECT column_name, data_type FROM analytics.information_schema.columns WHERE table_schema='taxi_silver' AND table_name='yellow_trips' ORDER BY ordinal_position
+  column_name | data_type
+  trip_id | STRING
+  file_month | STRING
+  vendor_id | INT
+  pickup_ts | TIMESTAMP_NTZ
+  dropoff_ts | TIMESTAMP_NTZ
+  passenger_count | INT
+  trip_distance | DOUBLE
+  ratecode_id | INT
+  store_and_fwd_flag | STRING
+  pu_location_id | INT
+  do_location_id | INT
+  payment_type | INT
+  fare_amount | DOUBLE
+  extra | DOUBLE
+  mta_tax | DOUBLE
+  tip_amount | DOUBLE
+  tolls_amount | DOUBLE
+  improvement_surcharge | DOUBLE
+  total_amount | DOUBLE
+  congestion_surcharge | DOUBLE
+  airport_fee | DOUBLE
+  cbd_congestion_fee | DOUBLE
+  request_source | STRING
+  _source_file | STRING
+  _source_row | LONG
+  _load_ts | TIMESTAMP
+> SELECT count(*) AS trip_id_dupes FROM (SELECT trip_id FROM analytics.taxi_silver.yellow_trips GROUP BY trip_id HAVING count(*) > 1)
+  trip_id_dupes
+  0
+
+## Schema difference check (re-run without request_source, which first appears in 2026-06 and is not in the table until such a month loads), 2026-11-16 20:18:00 IST
+> SELECT file_month, count(cbd_congestion_fee) AS cbd_fee_non_null, count(*) AS rows FROM analytics.taxi_bronze.yellow_trips GROUP BY 1 ORDER BY 1
+  file_month | cbd_fee_non_null | rows
+  2024-12 | 0 | 3668371
+  2025-01 | 3475226 | 3475226
+Expected from the files (a1-schema-diff-2024-12-vs-2025-01.txt): 2025-01 adds cbd_congestion_fee (double); 2024-12 has no such column, so its rows read NULL.

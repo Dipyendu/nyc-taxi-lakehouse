@@ -1,0 +1,18 @@
+# Backfill chunk 1 (2024-01..2024-11, Airflow backfill 21:10 to 21:49 IST): per-month reconciliation, 2026-11-16 21:50:10 IST
+LEDGER: start 2026-11-16 21:50:10, limit 300 s: backfill check chunk 2024: per-month reconciliation
+> WITH b AS (SELECT file_month, count(*) n FROM analytics.taxi_bronze.yellow_trips GROUP BY 1), s AS (SELECT file_month, count(*) n FROM analytics.taxi_silver.yellow_trips GROUP BY 1), q AS (SELECT file_month, count(*) n FROM analytics.taxi_silver.yellow_trips_quarantine GROUP BY 1), f AS (SELECT file_month, count(*) n FROM analytics.taxi_gold.fct_trips GROUP BY 1) SELECT m.file_month, m.rows AS metadata_rows, b.n AS bronze, s.n AS silver, q.n AS quarantine, f.n AS fact, (m.rows = b.n AND b.n = s.n + q.n AND f.n = s.n) AS reconciles FROM analytics.taxi_bronze.ingest_manifest m LEFT JOIN b USING (file_month) LEFT JOIN s USING (file_month) LEFT JOIN q USING (file_month) LEFT JOIN f USING (file_month) ORDER BY 1
+  file_month | metadata_rows | bronze | silver | quarantine | fact | reconciles
+  2024-01 | 2964624 | 2964624 | 2926943 | 37681 | 2926943 | true
+  2024-02 | 3007526 | 3007526 | 2966717 | 40809 | 2966717 | true
+  2024-03 | 3582628 | 3582628 | 3523771 | 58857 | 3523771 | true
+  2024-04 | 3514289 | 3514289 | 3456337 | 57952 | 3456337 | true
+  2024-05 | 3723833 | 3723833 | 3663501 | 60332 | 3663501 | true
+  2024-06 | 3539193 | 3539193 | 3477086 | 62107 | 3477086 | true
+  2024-07 | 3076903 | 3076903 | 3017904 | 58999 | 3017904 | true
+  2024-08 | 2979183 | 2979183 | 2920582 | 58601 | 2920582 | true
+  2024-09 | 3633030 | 3633030 | 3559381 | 73649 | 3559381 | true
+  2024-10 | 3833771 | 3833771 | 3757905 | 75866 | 3757905 | true
+  2024-11 | 3646369 | 3646369 | 3573387 | 72982 | 3573387 | true
+  2024-12 | 3668371 | 3668371 | 3589120 | 79251 | 3589120 | true
+  2025-01 | 3475226 | 3475226 | 3330526 | 144700 | 3330526 | true
+  2025-02 | 3577543 | 3577543 | 3394241 | 183302 | 3394241 | true

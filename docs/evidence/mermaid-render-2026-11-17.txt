@@ -1,0 +1,14 @@
+# Mermaid render check of every diagram at its current labels, 2026-11-17 (A13 to A15 of the documentation work)
+Method: each mermaid block is encoded as standard base64 JSON for https://mermaid.live/view#base64:...; after the page renders,
+the SVG in the page is inspected (aria-roledescription, node count, node text). Each check followed a different diagram or a
+fresh page load, because a hash change on an open page keeps the previous drawing.
+
+docs/architecture.md (identical to the first block of docs/DOCUMENTATION.md), rendered after its last label change:
+  role=flowchart-v2, 10 nodes; all 11 expected labels present, including "landing volume" and "_manifest/yellow/*.json";
+  no error text; the previous drawing's labels absent.
+README.md architecture diagram, rendered after its last label change:
+  role=flowchart-v2, 8 nodes; all 8 expected labels present, including "landing volume"; no error text.
+docs/DOCUMENTATION.md erDiagram, rendered after it was written (unchanged since):
+  role=er, 12 entity elements; fct_trips, the five dimensions and the key columns present; no error text.
+Control: a deliberately broken erDiagram on a fresh page did not render as an ER diagram (role=flowchart-v2, the editor's
+  default sample) and all 12 expected names were missing, so the check fails when a diagram does not render.

@@ -1,0 +1,14 @@
+# Fix: month filter moved from the stg_trips view into fct_trips (the view had been recreated with WHERE file_month = '2026-09' by the final verification reload). Fresh dbt build afterwards, 2026-11-16 22:59:16 IST
+17:30:17  Finished running 1 incremental model, 4 seeds, 7 table models, 35 data tests, 1 view model in 0 hours 0 minutes and 55.74 seconds (55.74s).
+17:30:17  Done. PASS=48 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=48
+dbt build exit=0
+LEDGER: start 2026-11-16 23:00:18, limit 300 s: final verification fix check: stg view rows vs silver; 2026-09 snapshot
+> SELECT (SELECT count(*) FROM analytics.taxi_gold.stg_trips) AS stg_view_rows, (SELECT count(*) FROM analytics.taxi_silver.yellow_trips) AS silver_rows, (SELECT count(DISTINCT file_month) FROM analytics.taxi_gold.stg_trips) AS stg_months
+  stg_view_rows | silver_rows | stg_months
+  119698837 | 119698837 | 33
+> SELECT 'bronze' AS layer, count(*) AS rows, sum(cast(xxhash64(`VendorID`, `tpep_pickup_datetime`, `tpep_dropoff_datetime`, `passenger_count`, `trip_distance`, `RatecodeID`, `store_and_fwd_flag`, `PULocationID`, `DOLocationID`, `payment_type`, `fare_amount`, `extra`, `mta_tax`, `tip_amount`, `tolls_amount`, `improvement_surcharge`, `total_amount`, `congestion_surcharge`, `Airport_fee`, `cbd_congestion_fee`, `_source_file`, `_source_row`, `file_month`, `request_source`) AS DECIMAL(38,0))) AS checksum FROM analytics.taxi_bronze.yellow_trips WHERE file_month = '2026-09'
+  layer | rows | checksum
+  bronze | 3876044 | 1496865884042246289199
+> SELECT 'fact' AS layer, count(*) AS rows, sum(cast(xxhash64(*) AS DECIMAL(38,0))) AS checksum FROM analytics.taxi_gold.fct_trips WHERE file_month = '2026-09'
+  layer | rows | checksum
+  fact | 3861245 | -9889572806665539712617

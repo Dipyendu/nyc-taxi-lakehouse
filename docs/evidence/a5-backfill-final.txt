@@ -1,0 +1,72 @@
+# Backfill final: all months 2024-01..2026-09 after three Airflow backfill chunks, 2026-11-16 22:49:50 IST
+LEDGER: start 2026-11-16 22:49:50, limit 600 s: backfill final checks: reconciliation, totals, rules, schema
+> WITH b AS (SELECT file_month, count(*) n FROM analytics.taxi_bronze.yellow_trips GROUP BY 1), s AS (SELECT file_month, count(*) n FROM analytics.taxi_silver.yellow_trips GROUP BY 1), q AS (SELECT file_month, count(*) n FROM analytics.taxi_silver.yellow_trips_quarantine GROUP BY 1), f AS (SELECT file_month, count(*) n FROM analytics.taxi_gold.fct_trips GROUP BY 1) SELECT m.file_month, m.rows AS metadata_rows, b.n AS bronze, s.n AS silver, q.n AS quarantine, f.n AS fact, (m.rows = b.n AND b.n = s.n + q.n AND f.n = s.n) AS reconciles FROM analytics.taxi_bronze.ingest_manifest m LEFT JOIN b USING (file_month) LEFT JOIN s USING (file_month) LEFT JOIN q USING (file_month) LEFT JOIN f USING (file_month) ORDER BY 1
+  file_month | metadata_rows | bronze | silver | quarantine | fact | reconciles
+  2024-01 | 2964624 | 2964624 | 2926943 | 37681 | 2926943 | true
+  2024-02 | 3007526 | 3007526 | 2966717 | 40809 | 2966717 | true
+  2024-03 | 3582628 | 3582628 | 3523771 | 58857 | 3523771 | true
+  2024-04 | 3514289 | 3514289 | 3456337 | 57952 | 3456337 | true
+  2024-05 | 3723833 | 3723833 | 3663501 | 60332 | 3663501 | true
+  2024-06 | 3539193 | 3539193 | 3477086 | 62107 | 3477086 | true
+  2024-07 | 3076903 | 3076903 | 3017904 | 58999 | 3017904 | true
+  2024-08 | 2979183 | 2979183 | 2920582 | 58601 | 2920582 | true
+  2024-09 | 3633030 | 3633030 | 3559381 | 73649 | 3559381 | true
+  2024-10 | 3833771 | 3833771 | 3757905 | 75866 | 3757905 | true
+  2024-11 | 3646369 | 3646369 | 3573387 | 72982 | 3573387 | true
+  2024-12 | 3668371 | 3668371 | 3589120 | 79251 | 3589120 | true
+  2025-01 | 3475226 | 3475226 | 3330526 | 144700 | 3330526 | true
+  2025-02 | 3577543 | 3577543 | 3394241 | 183302 | 3394241 | true
+  2025-03 | 4145257 | 4145257 | 3935865 | 209392 | 3935865 | true
+  2025-04 | 3970553 | 3970553 | 3783109 | 187444 | 3783109 | true
+  2025-05 | 4591845 | 4591845 | 4265644 | 326201 | 4265644 | true
+  2025-06 | 4322960 | 4322960 | 4046476 | 276484 | 4046476 | true
+  2025-07 | 3898963 | 3898963 | 3651400 | 247563 | 3651400 | true
+  2025-08 | 3574091 | 3574091 | 3312482 | 261609 | 3312482 | true
+  2025-09 | 4251015 | 4251015 | 3997747 | 253268 | 3997747 | true
+  2025-10 | 4428699 | 4428699 | 4106824 | 321875 | 4106824 | true
+  2025-11 | 4181444 | 4181444 | 3784356 | 397088 | 3784356 | true
+  2025-12 | 4305006 | 4305006 | 4255924 | 49082 | 4255924 | true
+  2026-01 | 3724889 | 3724889 | 3684736 | 40153 | 3684736 | true
+  2026-02 | 3399866 | 3399866 | 3372414 | 27452 | 3372414 | true
+  2026-03 | 3952451 | 3952451 | 3930982 | 21469 | 3930982 | true
+  2026-04 | 3831240 | 3831240 | 3816250 | 14990 | 3816250 | true
+  2026-05 | 4090836 | 4090836 | 4075838 | 14998 | 4075838 | true
+  2026-06 | 3837248 | 3837248 | 3822803 | 14445 | 3822803 | true
+  2026-07 | 3530109 | 3530109 | 3515235 | 14874 | 3515235 | true
+  2026-08 | 3336716 | 3336716 | 3322106 | 14610 | 3322106 | true
+  2026-09 | 3876044 | 3876044 | 3861245 | 14799 | 3861245 | true
+> SELECT count(*) AS months, sum(rows) AS metadata_rows, min(file_month) AS first_month, max(file_month) AS last_month FROM analytics.taxi_bronze.ingest_manifest
+  months | metadata_rows | first_month | last_month
+  33 | 123471721 | 2024-01 | 2026-09
+> SELECT (SELECT count(*) FROM analytics.taxi_bronze.yellow_trips) AS bronze_rows, (SELECT count(*) FROM analytics.taxi_silver.yellow_trips) AS silver_rows, (SELECT count(*) FROM analytics.taxi_silver.yellow_trips_quarantine) AS quarantine_rows, (SELECT count(*) FROM analytics.taxi_gold.fct_trips) AS fact_rows
+  bronze_rows | silver_rows | quarantine_rows | fact_rows
+  123471721 | 119698837 | 3772884 | 119698837
+> SELECT rule, count(*) AS rows FROM analytics.taxi_silver.yellow_trips_quarantine GROUP BY rule ORDER BY rows DESC
+  rule | rows
+  negative_fare_or_total | 3763632
+  dropoff_before_pickup | 3820
+  trip_distance_over_500mi | 3767
+  duration_over_24h | 863
+  pickup_outside_file_month | 802
+> SELECT file_month, count(request_source) AS request_source_non_null, count(cbd_congestion_fee) AS cbd_fee_non_null, count(*) AS rows FROM analytics.taxi_bronze.yellow_trips WHERE file_month IN ('2024-12','2025-01','2026-05','2026-06','2026-09') GROUP BY 1 ORDER BY 1
+  file_month | request_source_non_null | cbd_fee_non_null | rows
+  2024-12 | 0 | 0 | 3668371
+  2025-01 | 0 | 3475226 | 3475226
+  2026-05 | 0 | 4090836 | 4090836
+  2026-06 | 1013180 | 3837248 | 3837248
+  2026-09 | 1190092 | 3876044 | 3876044
+> SELECT count(DISTINCT schema_hash) AS distinct_schemas FROM analytics.taxi_bronze.ingest_manifest
+  distinct_schemas
+  3
+> SELECT (SELECT count(*) FROM analytics.taxi_gold.mart_daily_zone_demand) AS daily_zone_rows, (SELECT count(*) FROM analytics.taxi_gold.mart_hourly_demand) AS hourly_rows
+  daily_zone_rows | hourly_rows
+  239017 | 792
+
+## Memory during the backfill (docker stats every ~30 s, 177 samples, 21:11 to 22:49 IST)
+airflow peak 1086 MiB at 21:18:02 IST (limit 1,280 MiB); postgres peak 38 MiB (limit 256 MiB); host memory free never below 30 %
+
+## Backfill timing from the Airflow watcher
+chunk 2024-01..2024-11: 11 runs, 21:11:23 to 21:49:45 IST
+chunk 2025-03..2025-12: 10 runs, 21:50:01 to 22:23:41 IST
+chunk 2026-01..2026-09: 9 runs, 22:24:10 to 22:49:32 IST
+failed runs: 0 (watcher output); ledger rows for the 30 backfilled months: 150 (30 months x 5 tasks), all OK. (A first count of 1 non-OK row matched the Airflow skip of unpublished 2026-11 at 20:24:35 IST, which is not a backfill row.)

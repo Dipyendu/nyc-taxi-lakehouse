@@ -1,0 +1,42 @@
+# Rule tests: silver CASE rules on 14 handmade rows in the SQL warehouse, 2026-11-17 08:24:36 IST
+LEDGER: start 2026-11-17 08:24:36, limit 300 s: rule tests warehouse test of silver rules on 14 handmade rows
+
+id | expected | got
+1 | None | None
+2 | missing_timestamp | missing_timestamp
+3 | pickup_outside_file_month | pickup_outside_file_month
+4 | dropoff_before_pickup | dropoff_before_pickup
+5 | None | None
+6 | duration_over_24h | duration_over_24h
+7 | negative_trip_distance | negative_trip_distance
+8 | None | None
+9 | trip_distance_over_500mi | trip_distance_over_500mi
+10 | negative_fare_or_total | negative_fare_or_total
+11 | None | None
+12 | dropoff_before_pickup | dropoff_before_pickup
+13 | None | None
+14 | negative_fare_or_total | negative_fare_or_total
+.
+1 passed in 3.38s
+exit=0
+
+## Control: the same test with the 500-mile rule mutated to '>= 500' must fail, 08:24:49 IST
+LEDGER: start 2026-11-17 08:24:49, limit 300 s: rule tests mutation control for the warehouse rule test
+
+id | expected | got
+1 | None | None
+2 | missing_timestamp | missing_timestamp
+3 | pickup_outside_file_month | pickup_outside_file_month
+4 | dropoff_before_pickup | dropoff_before_pickup
+5 | None | None
+6 | duration_over_24h | duration_over_24h
+7 | negative_trip_distance | negative_trip_distance
+8 | None | trip_distance_over_500mi
+9 | trip_distance_over_500mi | trip_distance_over_500mi
+10 | negative_fare_or_total | negative_fare_or_total
+11 | None | None
+12 | dropoff_before_pickup | dropoff_before_pickup
+13 | None | None
+14 | negative_fare_or_total | negative_fare_or_total
+control ok: the mutated rule makes the test fail (row 8 changes)
+exit=0

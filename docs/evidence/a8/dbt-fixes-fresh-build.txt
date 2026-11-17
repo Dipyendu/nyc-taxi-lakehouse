@@ -1,0 +1,83 @@
+# dbt fixes (reconciliation fix reconcile from all tables, calendar fix calendar, gross amounts gross labels, duplicate check duplicate test, dbt descriptions descriptions and required month): fresh runs, 2026-11-17 08:31:14 IST
+## 1. dbt build with the month variable set to 2026-07 (8 threads)
+03:01:58  Finished running 1 incremental model, 4 seeds, 7 table models, 35 data tests, 1 view model in 0 hours 0 minutes and 38.07 seconds (38.07s).
+03:01:58  Done. PASS=48 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=48
+## 2. reconcile_months over all months
+03:02:14  1 of 1 PASS reconcile_months ................................................... [PASS in 3.72s]
+03:02:14  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=1
+## 3. duplicate_source_rows over all 33 months (no month var)
+03:02:50  1 of 1 WARN 5 duplicate_source_rows ............................................ [WARN 5 in 23.74s]
+03:02:50  [WARNING]: in test duplicate_source_rows (tests/duplicate_source_rows.sql)
+03:02:50  [WARNING]: Got 5 results, configured to warn if != 0
+03:02:50  Done. PASS=0 WARN=1 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=1
+## 4. fct_trips without a month must stop with a compile error
+03:03:02  1 of 1 ERROR creating sql incremental model taxi_gold.fct_trips ................ [ERROR in 0.01s]
+03:03:02  [ERROR]: in model fct_trips (models/facts/fct_trips.sql)
+  fct_trips: pass --vars '{month: YYYY-MM}'; an incremental run replaces one month
+
+## 3b. The 5 months the duplicate test reports, 08:33:15 IST
+LEDGER: start 2026-11-17 08:33:15, limit 600 s: duplicate check duplicate groups by month
+> SELECT file_month, count(*) AS duplicate_groups, sum(n) AS rows_in_groups FROM (SELECT file_month, count(*) n FROM analytics.taxi_bronze.yellow_trips GROUP BY file_month, VendorID, tpep_pickup_datetime, tpep_dropoff_datetime, passenger_count, trip_distance, RatecodeID, store_and_fwd_flag, PULocationID, DOLocationID, payment_type, fare_amount, extra, mta_tax, tip_amount, tolls_amount, improvement_surcharge, total_amount, congestion_surcharge, Airport_fee, cbd_congestion_fee, request_source HAVING count(*) > 1) GROUP BY file_month ORDER BY file_month
+  file_month | duplicate_groups | rows_in_groups
+  2024-02 | 1 | 2
+  2024-07 | 1 | 2
+  2024-10 | 2 | 4
+  2025-07 | 1 | 2
+  2026-08 | 7 | 14
+
+## 5. Control for the new reconcile branches: the compiled test with the manifest CTE emptied must return failing rows, 08:45:04 IST
+LEDGER: start 2026-11-17 08:45:04, limit 300 s: reconciliation fix control: reconcile with empty manifest
+-- Months come from all five tables, so a month missing from any of them is reported, and an empty
+-- manifest is a failure, not a pass. Zero rows returned = pass.
+with manifest as (
+    select file_month, rows as metadata_rows from `analytics`.`taxi_bronze`.`ingest_manifest` where 1 = 0
+),
+bronze as (
+    select file_month, count(*) as bronze_rows from `analytics`.`taxi_bronze`.`yellow_trips` group by file_month
+),
+silver as (
+    select file_month, count(*) as silver_rows from `analytics`.`taxi_silver`.`yellow_trips` group by file_month
+),
+quarantine as (
+    select file_month, count(*) as quarantine_rows
+    from `analytics`.`taxi_silver`.`yellow_trips_quarantine` group by file_month
+),
+fact as (
+    select file_month, count(*) as fact_rows from `analytics`.`taxi_gold`.`fct_trips` group by file_month
+),
+months as (
+    select file_month from manifest
+    union select file_month from bronze
+    union select file_month from silver
+    union select file_month from quarantine
+    union select file_month from fact
+),
+checked as (
+    select
+        mo.file_month,
+        m.metadata_rows,
+        b.bronze_rows,
+        s.silver_rows,
+        coalesce(q.quarantine_rows, 0) as quarantine_rows,
+        f.fact_rows
+    from months mo
+    left join manifest m using (file_month)
+    left join bronze b using (file_month)
+    left join silver s using (file_month)
+    left join quarantine q using (file_month)
+    left join fact f using (file_month)
+)
+select * from checked
+where metadata_rows is null
+   or bronze_rows is null
+   or silver_rows is null
+   or fact_rows is null
+   or metadata_rows <> bronze_rows
+   or bronze_rows <> silver_rows + quarantine_rows
+   or fact_rows <> silver_rows
+union all
+select 'no months in the manifest', null, null, null, null, null
+where (select count(*) from manifest) = 0)
+  failing_rows | empty_manifest_rows
+  34 | 1
+Expected: 34 failing rows (33 months with no manifest row, plus 'no months in the manifest').

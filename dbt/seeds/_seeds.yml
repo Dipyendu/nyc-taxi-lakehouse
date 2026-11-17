@@ -1,0 +1,17 @@
+version: 2
+# Code lists copied from the TLC "Data Dictionary - Yellow Taxi Trip Records", March 18, 2025
+# (https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf).
+# taxi_zone_lookup.csv: https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv
+seeds:
+  - name: taxi_zone_lookup
+    config:
+      column_types: {LocationID: int, Borough: string, Zone: string, service_zone: string}
+  - name: taxi_vendor
+    config:
+      column_types: {vendor_id: int, vendor_name: string}
+  - name: taxi_ratecode
+    config:
+      column_types: {ratecode_id: int, ratecode_name: string}
+  - name: taxi_payment_type
+    config:
+      column_types: {payment_type: int, payment_type_name: string}

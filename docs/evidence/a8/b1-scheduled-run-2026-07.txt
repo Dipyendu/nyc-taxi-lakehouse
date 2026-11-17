@@ -1,0 +1,33 @@
+# Schedule fix real run: the existing scheduled run scheduled__2026-11-01 cleared and re-run with the new month logic (target_month -> 2026-07). Also acceptance 2 (fresh reload, now with silver, quarantine, Delta versions and load times) and rule tests (silver job using rule_case_sql).
+## BEFORE, 2026-11-17 08:26:38 IST
+LEDGER: start 2026-11-17 08:26:38, limit 300 s: review fixes snapshot before scheduled run (2026-07)
+layer | rows | checksum | delta_version | max_load_ts
+bronze | 3530109 | 5366682855339077938275 | 34 | 2026-11-16T17:11:18.245Z
+silver | 3515235 | -1072469006373837073109 | 34 | 2026-11-16T17:11:18.245Z
+quarantine | 14874 | 343271077289561007585 | 34 | 2026-11-16T17:11:18.245Z
+fact | 3515235 | -18376722266518294153979 | 34 | None
+## AFTER, 2026-11-17 08:29:33 IST
+LEDGER: start 2026-11-17 08:29:33, limit 300 s: review fixes snapshot after scheduled run (2026-07)
+layer | rows | checksum | delta_version | max_load_ts
+bronze | 3530109 | 5366682855339077938275 | 35 | 2026-11-17T02:57:13.164Z
+silver | 3515235 | -1072469006373837073109 | 35 | 2026-11-17T02:57:13.164Z
+quarantine | 14874 | 343271077289561007585 | 35 | 2026-11-17T02:57:13.164Z
+fact | 3515235 | -18376722266518294153979 | 35 | None
+
+## Airflow: run and task states (times UTC; IST = UTC + 5:30)
+dag_id        run_id                                state    run_after                         logical_date               start_date                        end_date
+taxi_monthly  scheduled__2026-11-01T00:00:00+00:00  success  2026-11-01T00:00:00+00:00         2026-11-01T00:00:00+00:00  2026-11-17T02:56:54.112867+00:00  2026-11-17T02:59:19.549520+00:00
+dag_id       | logical_date              | task_id   | state   | start_date                       | end_date                        
+=============+===========================+===========+=========+==================================+=================================
+taxi_monthly | 2026-11-01T00:00:00+00:00 | dbt_build | success | 2026-11-17T02:58:00.372388+00:00 | 2026-11-17T02:59:05.633309+00:00
+taxi_monthly | 2026-11-01T00:00:00+00:00 | ingest    | success | 2026-11-17T02:56:54.224735+00:00 | 2026-11-17T02:57:00.573644+00:00
+taxi_monthly | 2026-11-01T00:00:00+00:00 | reconcile | success | 2026-11-17T02:59:05.801783+00:00 | 2026-11-17T02:59:18.930734+00:00
+taxi_monthly | 2026-11-01T00:00:00+00:00 | silver    | success | 2026-11-17T02:57:31.277065+00:00 | 2026-11-17T02:57:59.715100+00:00
+taxi_monthly | 2026-11-01T00:00:00+00:00 | bronze    | success | 2026-11-17T02:57:01.046289+00:00 | 2026-11-17T02:57:30.929525+00:00
+                                                                                                                                    
+## Ledger rows of this run (the month in each row was rendered by target_month; no month parameter was given)
+| 2026-11-17 08:26:55 | airflow ingest 2026-07 | 1 month | 5 s | OK |
+| 2026-11-17 08:27:01 | airflow bronze 2026-07 | 1 month | 29 s | OK |
+| 2026-11-17 08:27:31 | airflow silver 2026-07 | 1 month | 28 s | OK |
+| 2026-11-17 08:28:00 | airflow dbt build 2026-07 | 1 month | 65 s | OK |
+| 2026-11-17 08:29:05 | airflow dbt reconcile 2026-07 | 1 month | 13 s | OK |

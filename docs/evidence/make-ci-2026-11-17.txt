@@ -1,0 +1,11 @@
+# make ci, 2026-11-17 11:17:31 IST (lint, unit tests, offline dbt parse); exit code 0
+# ANSI colour codes removed; the repository path is shown as <repo>; dbt log times are UTC (IST = UTC + 5:30)
+uv run ruff check .
+All checks passed!
+uv run pytest -q
+..........................................s......................        [100%]
+64 passed, 1 skipped in 3.12s
+cd dbt && uv run dbt parse --profiles-dir . --target ci
+05:47:36  Running with dbt=1.12.6
+05:47:38  Registered adapter: databricks=1.13.0
+05:47:39  Performance info: <repo>/dbt/target/perf_info.json

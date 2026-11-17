@@ -1,0 +1,12 @@
+# Gross amounts: what the negative_fare_or_total quarantine rows are, by payment type (TLC dictionary, 18 Mar 2025: 0 Flex Fare, 1 Credit card, 2 Cash, 3 No charge, 4 Dispute, 5 Unknown, 6 Voided trip), 2026-11-17 08:27:59 IST
+LEDGER: start 2026-11-17 08:27:59, limit 300 s: gross amounts query: negative-fare rows by payment type
+> SELECT payment_type, count(*) AS rows, round(100 * count(*) / sum(count(*)) OVER (), 2) AS pct, sum(CASE WHEN total_amount < 0 THEN 1 ELSE 0 END) AS total_negative FROM analytics.taxi_silver.yellow_trips_quarantine WHERE rule = 'negative_fare_or_total' GROUP BY payment_type ORDER BY rows DESC
+  payment_type | rows | pct | total_negative
+  0 | 2174010 | 57.76 | 169838
+  4 | 992518 | 26.37 | 992515
+  2 | 381210 | 10.13 | 381210
+  3 | 210120 | 5.58 | 210120
+  1 | 5774 | 0.15 | 5774
+> SELECT round(100 * sum(CASE WHEN payment_type IN (3, 4, 6) THEN 1 ELSE 0 END) / count(*), 2) AS pct_no_charge_dispute_voided, round(100 * sum(CASE WHEN total_amount < 0 THEN 1 ELSE 0 END) / count(*), 2) AS pct_total_negative FROM analytics.taxi_silver.yellow_trips_quarantine WHERE rule = 'negative_fare_or_total'
+  pct_no_charge_dispute_voided | pct_total_negative
+  31.95 | 46.75

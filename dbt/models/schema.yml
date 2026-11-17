@@ -1,0 +1,96 @@
+version: 2
+
+models:
+  - name: stg_trips
+    description: "View over the cleaned silver trips with codes normalised (missing rate code becomes 99, 'Null/unknown') and derived pickup date, hour and duration."
+    columns:
+      - name: trip_id
+        description: "File month plus the row's position in the source file; stable while the source file is unchanged."
+        data_tests: [unique, not_null]
+
+  - name: dim_zone
+    description: "TLC taxi zones from the official lookup file; location_id joins to pickup and drop-off zones."
+    columns:
+      - name: location_id
+        description: "TLC taxi zone id."
+        data_tests: [unique, not_null]
+  - name: dim_vendor
+    description: "Trip record providers (VendorID codes from the TLC data dictionary of 18 March 2025)."
+    columns:
+      - name: vendor_id
+        description: "TPEP provider code."
+        data_tests: [unique, not_null]
+  - name: dim_ratecode
+    description: "Final rate codes from the TLC data dictionary; 99 means Null/unknown."
+    columns:
+      - name: ratecode_id
+        description: "Final rate code in effect at the end of the trip."
+        data_tests: [unique, not_null]
+  - name: dim_payment_type
+    description: "Payment type codes from the TLC data dictionary."
+    columns:
+      - name: payment_type
+        description: "How the passenger paid (code)."
+        data_tests: [unique, not_null]
+  - name: dim_date
+    description: "One row per day from 2024-01-01 to the end of next year."
+    columns:
+      - name: date_day
+        description: "Calendar day."
+        data_tests: [unique, not_null]
+
+  - name: fct_trips
+    description: "One row per clean trip (grain: trip_id = file month plus row position in the source file). Incremental; each run replaces one month."
+    columns:
+      - name: trip_id
+        description: "File month plus the row's position in the source file; stable while the source file is unchanged."
+        data_tests: [unique, not_null]
+      - name: file_month
+        description: "Month of the source file (YYYY-MM)."
+        data_tests: [not_null]
+      - name: pickup_date
+        description: "Date the meter was engaged."
+        data_tests:
+          - not_null
+          - relationships: {arguments: {to: ref('dim_date'), field: date_day}}
+      - name: pu_location_id
+        description: "Pickup zone."
+        data_tests:
+          - not_null
+          - relationships: {arguments: {to: ref('dim_zone'), field: location_id}}
+      - name: do_location_id
+        description: "Drop-off zone."
+        data_tests:
+          - not_null
+          - relationships: {arguments: {to: ref('dim_zone'), field: location_id}}
+      - name: vendor_id
+        description: "TPEP provider code."
+        data_tests:
+          - not_null
+          - accepted_values: {arguments: {values: [1, 2, 6, 7], quote: false}}
+          - relationships: {arguments: {to: ref('dim_vendor'), field: vendor_id}}
+      - name: ratecode_id
+        description: "Final rate code in effect at the end of the trip."
+        data_tests:
+          - not_null
+          - accepted_values: {arguments: {values: [1, 2, 3, 4, 5, 6, 99], quote: false}}
+          - relationships: {arguments: {to: ref('dim_ratecode'), field: ratecode_id}}
+      - name: payment_type
+        description: "How the passenger paid (code)."
+        data_tests:
+          - not_null
+          - accepted_values: {arguments: {values: [0, 1, 2, 3, 4, 5, 6], quote: false}}
+          - relationships: {arguments: {to: ref('dim_payment_type'), field: payment_type}}
+
+  - name: mart_daily_zone_demand
+    description: "Trips, gross total amount and average distance per pickup date and pickup zone."
+    columns:
+      - name: demand_key
+        description: "Grain key of the mart row."
+        data_tests: [unique, not_null]
+  - name: mart_hourly_demand
+    description: "Trips, average gross total amount and average duration per month and hour of pickup."
+    columns:
+      - name: demand_key
+        description: "Grain key of the mart row."
+        data_tests: [unique, not_null]

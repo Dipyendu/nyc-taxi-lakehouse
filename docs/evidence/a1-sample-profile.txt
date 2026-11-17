@@ -1,0 +1,41 @@
+# Rule-candidate profile, row group by row group, 2026-11-16 19:49:17 IST
+
+## 2024-12: rows=3668371
+  pickup_outside_file_month: 34
+  dropoff_before_pickup: 99
+  dropoff_equals_pickup: 1124
+  duration_over_24h: 18
+  negative_trip_distance: 0
+  zero_trip_distance: 75450
+  trip_distance_over_500: 83
+  negative_fare_amount: 78444
+  negative_total_amount: 70496
+  pu_location_outside_1_265: 0
+  do_location_outside_1_265: 0
+  pickup_null: 0
+  dropoff_null: 0
+  values VendorID: {1: 829242, 2: 2838485, 6: 414, 7: 230}
+  values RatecodeID: {1: 3126642, 2: 115805, 3: 12448, 4: 8916, 5: 36147, 6: 6, 99: 42116, None: 326291}
+  values payment_type: {0: 326291, 1: 2733369, 2: 490651, 3: 28938, 4: 89122}
+  values store_and_fwd_flag: {'N': 3324497, 'Y': 17583, None: 326291}
+  values passenger_count: {0: 30397, 1: 2531706, 2: 507628, 3: 133727, 4: 102116, 5: 22283, 6: 14205, 7: 7, 8: 9, 9: 2, None: 326291}
+
+## 2025-01: rows=3475226
+  pickup_outside_file_month: 22
+  dropoff_before_pickup: 124
+  dropoff_equals_pickup: 1927
+  duration_over_24h: 20
+  negative_trip_distance: 0
+  zero_trip_distance: 90893
+  trip_distance_over_500: 118
+  negative_fare_amount: 144118
+  negative_total_amount: 63037
+  pu_location_outside_1_265: 0
+  do_location_outside_1_265: 0
+  pickup_null: 0
+  dropoff_null: 0
+  values VendorID: {1: 753671, 2: 2719860, 6: 489, 7: 1206}
+  values RatecodeID: {1: 2756472, 2: 94420, 3: 8622, 4: 7092, 5: 26501, 6: 7, 99: 41963, None: 540149}
+  values payment_type: {0: 540149, 1: 2444393, 2: 390429, 3: 23773, 4: 76481, 5: 1}
+  values store_and_fwd_flag: {'N': 2927431, 'Y': 7646, None: 540149}
+  values passenger_count: {0: 24656, 1: 2322434, 2: 407761, 3: 91409, 4: 59009, 5: 17786, 6: 12004, 7: 4, 8: 11, 9: 3, None: 540149}

@@ -1,0 +1,14 @@
+# Job deployment test: bundle-deployed serverless job taxi_bronze, month 2025-01, checked 2026-11-16 20:13:51 IST
+run: | 2026-11-16 20:13:02 | job deployment test: job taxi_bronze month=2025-01 (bundle-deployed, serverless) | 1 file, 59,158,238 bytes, 3,475,226 rows | 38 s | OK |
+> SELECT file_month, count(*) AS bronze_rows, count(DISTINCT _source_row) AS distinct_source_rows, min(_source_file) AS source_file, min(_load_ts) AS load_ts FROM analytics.taxi_bronze.yellow_trips GROUP BY file_month
+  file_month | bronze_rows | distinct_source_rows | source_file | load_ts
+  2025-01 | 3475226 | 3475226 | yellow_tripdata_2025-01.parquet | 2026-11-16T14:43:18.485Z
+> SELECT file_month, file, bytes, rows, schema_hash, uploaded_at FROM analytics.taxi_bronze.ingest_manifest
+  file_month | file | bytes | rows | schema_hash | uploaded_at
+  2025-01 | yellow_tripdata_2025-01.parquet | 59158238 | 3475226 | 351194d0dc1e93c2 | 2026-11-16T14:41:39.000Z
+> SELECT count(*) AS cols FROM analytics.information_schema.columns WHERE table_schema='taxi_bronze' AND table_name='yellow_trips'
+  cols
+  24
+> DESCRIBE DETAIL analytics.taxi_bronze.yellow_trips
+  format | id | name | description | location | createdAt | lastModified | partitionColumns | clusteringColumns | numFiles | sizeInBytes | properties | minReaderVersion | minWriterVersion | tableFeatures | statistics | clusterByAuto
+  delta | 1644c70f-8e0d-44cf-88d1-6760da3644b1 | analytics.taxi_bronze.yellow_trips | NULL |  | 2026-11-16T14:43:18.066Z | 2026-11-16T14:43:25.000Z | ["file_month"] | [] | 1 | 56902102 | {"delta.parquet.compression.codec":"zstd","delta.parquet.format.version.afe.internal":"2.12.0","delta.enableDeletionVectors":"true","delta.parquet.format.version":"2.12.0","delta.enableRowTracking":"true","delta.checkpointPolicy":"v2","io.unitycatalog.tableId":"74aa5381-8fed-451d-983d-c6192a05d059","delta.rowTracking.materializedRowCommitVersionColumnName":"_row-commit-version-col-cf293b78-7749-4c36-909e-8401ea93411c","delta.rowTracking.materializedRowIdColumnName":"_row-id-col-d182840c-db1b-4733-862b-1e1494d6f7de"} | 3 | 7 | ["appendOnly","deletionVectors","domainMetadata","invariants","rowTracking","timestampNtz","v2Checkpoint"] | {"numRowsDeletedByDeletionVectors":"0","numDeletionVectors":"0"} | false

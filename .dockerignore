@@ -1,0 +1,3 @@
+# The image needs only airflow/requirements.txt (see airflow/Dockerfile); the code is mounted at run time.
+*
+!airflow/requirements.txt

@@ -1,0 +1,207 @@
+# Dbt: dbt build on the sample (2024-12, 2025-01), full run without a month var, 2026-11-16 20:18:25 IST
+14:48:26  Running with dbt=1.12.6
+14:48:28  Registered adapter: databricks=1.13.0
+14:48:29  Unable to do partial parsing because config vars, config profile, or config target have changed
+14:48:29  Unable to do partial parsing because profile has changed
+14:48:30  Found 9 models, 35 data tests, 4 seeds, 4 sources, 782 macros
+14:48:30  
+14:48:30  Concurrency: 4 threads (target='dev')
+14:48:30  
+14:48:36  1 of 48 START sql view model taxi_gold.dim_date ................................ [RUN]
+14:48:36  2 of 48 START sql view model taxi_gold.stg_trips ............................... [RUN]
+14:48:36  3 of 48 START seed file taxi_gold.taxi_payment_type ............................ [RUN]
+14:48:36  4 of 48 START seed file taxi_gold.taxi_ratecode ................................ [RUN]
+14:48:38  2 of 48 ERROR creating sql view model taxi_gold.stg_trips ...................... [ERROR in 2.03s]
+14:48:38  5 of 48 START seed file taxi_gold.taxi_vendor .................................. [RUN]
+14:48:39  1 of 48 OK created sql view model taxi_gold.dim_date ........................... [OK in 2.35s]
+14:48:39  6 of 48 START seed file taxi_gold.taxi_zone_lookup ............................. [RUN]
+14:48:42  3 of 48 OK loaded seed file taxi_gold.taxi_payment_type ........................ [INSERT 7 in 6.18s]
+14:48:42  7 of 48 SKIP test not_null_stg_trips_trip_id ................................... [SKIP]
+14:48:42  4 of 48 OK loaded seed file taxi_gold.taxi_ratecode ............................ [INSERT 7 in 6.18s]
+14:48:42  8 of 48 SKIP test unique_stg_trips_trip_id ..................................... [SKIP]
+14:48:42  9 of 48 START test not_null_dim_date_date_day .................................. [RUN]
+14:48:42  10 of 48 START test unique_dim_date_date_day ................................... [RUN]
+14:48:43  5 of 48 OK loaded seed file taxi_gold.taxi_vendor .............................. [INSERT 4 in 4.56s]
+14:48:43  11 of 48 START sql view model taxi_gold.dim_payment_type ....................... [RUN]
+14:48:44  6 of 48 OK loaded seed file taxi_gold.taxi_zone_lookup ......................... [INSERT 265 in 5.43s]
+14:48:44  12 of 48 START sql view model taxi_gold.dim_ratecode ........................... [RUN]
+14:48:44  9 of 48 PASS not_null_dim_date_date_day ........................................ [PASS in 1.84s]
+14:48:44  13 of 48 SKIP relation taxi_gold.fct_trips ..................................... [SKIP]
+14:48:44  14 of 48 START sql view model taxi_gold.dim_vendor ............................. [RUN]
+14:48:44  10 of 48 PASS unique_dim_date_date_day ......................................... [PASS in 1.87s]
+14:48:44  15 of 48 START sql view model taxi_gold.dim_zone ............................... [RUN]
+14:48:45  11 of 48 OK created sql view model taxi_gold.dim_payment_type .................. [OK in 1.92s]
+14:48:45  16 of 48 SKIP test accepted_values_fct_trips_payment_type__False__0__1__2__3__4__5__6  [SKIP]
+14:48:45  17 of 48 SKIP test accepted_values_fct_trips_ratecode_id__False__1__2__3__4__5__6__99  [SKIP]
+14:48:45  18 of 48 SKIP test accepted_values_fct_trips_vendor_id__False__1__2__6__7 ...... [SKIP]
+14:48:45  19 of 48 SKIP test not_null_fct_trips_do_location_id ........................... [SKIP]
+14:48:45  20 of 48 SKIP test not_null_fct_trips_file_month ............................... [SKIP]
+14:48:45  21 of 48 SKIP test not_null_fct_trips_payment_type ............................. [SKIP]
+14:48:45  22 of 48 SKIP test not_null_fct_trips_pickup_date .............................. [SKIP]
+14:48:45  23 of 48 SKIP test not_null_fct_trips_pu_location_id ........................... [SKIP]
+14:48:45  24 of 48 SKIP test not_null_fct_trips_ratecode_id .............................. [SKIP]
+14:48:45  25 of 48 SKIP test not_null_fct_trips_trip_id .................................. [SKIP]
+14:48:45  26 of 48 SKIP test not_null_fct_trips_vendor_id ................................ [SKIP]
+14:48:45  27 of 48 SKIP test reconcile_months ............................................ [SKIP]
+14:48:45  28 of 48 SKIP test relationships_fct_trips_pickup_date__date_day__ref_dim_date_  [SKIP]
+14:48:45  29 of 48 SKIP test unique_fct_trips_trip_id .................................... [SKIP]
+14:48:45  30 of 48 START test not_null_dim_payment_type_payment_type ..................... [RUN]
+14:48:46  12 of 48 OK created sql view model taxi_gold.dim_ratecode ...................... [OK in 2.16s]
+14:48:46  31 of 48 START test unique_dim_payment_type_payment_type ....................... [RUN]
+14:48:46  14 of 48 OK created sql view model taxi_gold.dim_vendor ........................ [OK in 1.93s]
+14:48:46  32 of 48 SKIP test relationships_fct_trips_payment_type__payment_type__ref_dim_payment_type_  [SKIP]
+14:48:46  33 of 48 SKIP relation taxi_gold.mart_hourly_demand ............................ [SKIP]
+14:48:46  34 of 48 START test not_null_dim_ratecode_ratecode_id .......................... [RUN]
+14:48:46  15 of 48 OK created sql view model taxi_gold.dim_zone .......................... [OK in 1.96s]
+14:48:46  35 of 48 START test unique_dim_ratecode_ratecode_id ............................ [RUN]
+14:48:47  30 of 48 PASS not_null_dim_payment_type_payment_type ........................... [PASS in 2.11s]
+14:48:47  36 of 48 SKIP test relationships_fct_trips_ratecode_id__ratecode_id__ref_dim_ratecode_  [SKIP]
+14:48:47  37 of 48 START test not_null_dim_vendor_vendor_id .............................. [RUN]
+14:48:48  34 of 48 PASS not_null_dim_ratecode_ratecode_id ................................ [PASS in 2.02s]
+14:48:48  38 of 48 START test unique_dim_vendor_vendor_id ................................ [RUN]
+14:48:48  31 of 48 PASS unique_dim_payment_type_payment_type ............................. [PASS in 2.12s]
+14:48:48  39 of 48 SKIP test relationships_fct_trips_vendor_id__vendor_id__ref_dim_vendor_  [SKIP]
+14:48:48  40 of 48 SKIP test not_null_mart_hourly_demand_demand_key ...................... [SKIP]
+14:48:48  41 of 48 SKIP test unique_mart_hourly_demand_demand_key ........................ [SKIP]
+14:48:48  42 of 48 START test not_null_dim_zone_location_id .............................. [RUN]
+14:48:48  35 of 48 PASS unique_dim_ratecode_ratecode_id .................................. [PASS in 2.24s]
+14:48:48  43 of 48 START test unique_dim_zone_location_id ................................ [RUN]
+14:48:49  37 of 48 PASS not_null_dim_vendor_vendor_id .................................... [PASS in 2.01s]
+14:48:49  44 of 48 SKIP test relationships_fct_trips_do_location_id__location_id__ref_dim_zone_  [SKIP]
+14:48:49  45 of 48 SKIP test relationships_fct_trips_pu_location_id__location_id__ref_dim_zone_  [SKIP]
+14:48:50  38 of 48 PASS unique_dim_vendor_vendor_id ...................................... [PASS in 1.97s]
+14:48:50  42 of 48 PASS not_null_dim_zone_location_id .................................... [PASS in 1.90s]
+14:48:51  43 of 48 PASS unique_dim_zone_location_id ...................................... [PASS in 2.07s]
+14:48:51  46 of 48 SKIP relation taxi_gold.mart_daily_zone_demand ........................ [SKIP]
+14:48:51  47 of 48 SKIP test not_null_mart_daily_zone_demand_demand_key .................. [SKIP]
+14:48:51  48 of 48 SKIP test unique_mart_daily_zone_demand_demand_key .................... [SKIP]
+14:48:51  
+14:48:51  Finished running 1 incremental model, 4 seeds, 35 data tests, 8 view models in 0 hours 0 minutes and 20.83 seconds (20.83s).
+14:48:51  
+14:48:51  Completed with 1 error, 0 partial successes, and 0 warnings:
+14:48:51  
+14:48:51  [ERROR]: in model stg_trips (models/staging/stg_trips.sql)
+14:48:51    Database Error in model stg_trips (models/staging/stg_trips.sql)
+  [TABLE_OR_VIEW_NOT_FOUND] The table or view `{{ env_var('taxi_catalog', 'analytics') }}`.`taxi_silver`.`yellow_trips` cannot be found. Verify the spelling and correctness of the schema and catalog.
+  Search path: [`system`.`session`, `system`.`builtin`, `system`.`ai`, `analytics`.`taxi_gold`].
+  If you did not qualify the name with a schema, verify the current_schema() output, or qualify the name with the correct schema and catalog.
+  To tolerate the error on drop use DROP VIEW IF EXISTS or DROP TABLE IF EXISTS. SQLSTATE: 42P01; line 38 pos 5
+  compiled code at target/run/taxi/models/staging/stg_trips.sql
+14:48:51  
+14:48:51    compiled code at target/compiled/taxi/models/staging/stg_trips.sql
+14:48:51  
+14:48:51  Done. PASS=19 WARN=0 ERROR=1 SKIP=28 NO-OP=0 REUSED=0 TOTAL=48
+exit=1
+
+## Retry after fix (sources use target.catalog; dims and marts materialised as tables), 2026-11-16 20:19:20 IST
+14:49:22  Running with dbt=1.12.6
+14:49:23  Registered adapter: databricks=1.13.0
+14:49:23  Unable to do partial parsing because config vars, config profile, or config target have changed
+14:49:23  Unable to do partial parsing because profile has changed
+14:49:25  Found 9 models, 35 data tests, 4 seeds, 4 sources, 782 macros
+14:49:25  
+14:49:25  Concurrency: 4 threads (target='dev')
+14:49:25  
+14:49:31  1 of 48 START sql table model taxi_gold.dim_date ............................... [RUN]
+14:49:31  2 of 48 START sql view model taxi_gold.stg_trips ............................... [RUN]
+14:49:31  3 of 48 START seed file taxi_gold.taxi_payment_type ............................ [RUN]
+14:49:31  4 of 48 START seed file taxi_gold.taxi_ratecode ................................ [RUN]
+14:49:33  2 of 48 OK created sql view model taxi_gold.stg_trips .......................... [OK in 2.22s]
+14:49:33  5 of 48 START seed file taxi_gold.taxi_vendor .................................. [RUN]
+14:49:35  3 of 48 OK loaded seed file taxi_gold.taxi_payment_type ........................ [INSERT 7 in 3.89s]
+14:49:35  4 of 48 OK loaded seed file taxi_gold.taxi_ratecode ............................ [INSERT 7 in 3.89s]
+14:49:35  6 of 48 START seed file taxi_gold.taxi_zone_lookup ............................. [RUN]
+14:49:35  7 of 48 START test not_null_stg_trips_trip_id .................................. [RUN]
+14:49:37  1 of 48 OK created sql table model taxi_gold.dim_date .......................... [OK in 5.41s]
+14:49:37  8 of 48 START test unique_stg_trips_trip_id .................................... [RUN]
+14:49:37  7 of 48 PASS not_null_stg_trips_trip_id ........................................ [PASS in 2.13s]
+14:49:37  9 of 48 START sql table model taxi_gold.dim_payment_type ....................... [RUN]
+14:49:38  5 of 48 OK loaded seed file taxi_gold.taxi_vendor .............................. [INSERT 4 in 4.47s]
+14:49:38  10 of 48 START sql table model taxi_gold.dim_ratecode .......................... [RUN]
+14:49:39  8 of 48 PASS unique_stg_trips_trip_id .......................................... [PASS in 2.41s]
+14:49:39  6 of 48 OK loaded seed file taxi_gold.taxi_zone_lookup ......................... [INSERT 265 in 3.93s]
+14:49:39  11 of 48 START test not_null_dim_date_date_day ................................. [RUN]
+14:49:39  12 of 48 START test unique_dim_date_date_day ................................... [RUN]
+14:49:41  11 of 48 PASS not_null_dim_date_date_day ....................................... [PASS in 1.82s]
+14:49:41  13 of 48 START sql table model taxi_gold.dim_vendor ............................ [RUN]
+14:49:41  12 of 48 PASS unique_dim_date_date_day ......................................... [PASS in 1.90s]
+14:49:41  14 of 48 START sql incremental model taxi_gold.fct_trips ....................... [RUN]
+14:49:42  9 of 48 OK created sql table model taxi_gold.dim_payment_type .................. [OK in 4.74s]
+14:49:42  15 of 48 START sql table model taxi_gold.dim_zone .............................. [RUN]
+14:49:43  10 of 48 OK created sql table model taxi_gold.dim_ratecode ..................... [OK in 5.08s]
+14:49:43  16 of 48 START test not_null_dim_payment_type_payment_type ..................... [RUN]
+14:49:45  16 of 48 PASS not_null_dim_payment_type_payment_type ........................... [PASS in 2.18s]
+14:49:45  17 of 48 START test unique_dim_payment_type_payment_type ....................... [RUN]
+14:49:46  13 of 48 OK created sql table model taxi_gold.dim_vendor ....................... [OK in 4.79s]
+14:49:46  18 of 48 START test not_null_dim_ratecode_ratecode_id .......................... [RUN]
+14:49:47  17 of 48 PASS unique_dim_payment_type_payment_type ............................. [PASS in 1.83s]
+14:49:47  19 of 48 START test unique_dim_ratecode_ratecode_id ............................ [RUN]
+14:49:48  18 of 48 PASS not_null_dim_ratecode_ratecode_id ................................ [PASS in 1.89s]
+14:49:48  20 of 48 START test not_null_dim_vendor_vendor_id .............................. [RUN]
+14:49:48  15 of 48 OK created sql table model taxi_gold.dim_zone ......................... [OK in 6.34s]
+14:49:48  21 of 48 START test unique_dim_vendor_vendor_id ................................ [RUN]
+14:49:49  19 of 48 PASS unique_dim_ratecode_ratecode_id .................................. [PASS in 1.81s]
+14:49:49  22 of 48 START test not_null_dim_zone_location_id .............................. [RUN]
+14:49:49  20 of 48 PASS not_null_dim_vendor_vendor_id .................................... [PASS in 1.90s]
+14:49:49  23 of 48 START test unique_dim_zone_location_id ................................ [RUN]
+14:49:50  21 of 48 PASS unique_dim_vendor_vendor_id ...................................... [PASS in 1.92s]
+14:49:50  14 of 48 OK created sql incremental model taxi_gold.fct_trips .................. [OK in 9.43s]
+14:49:50  24 of 48 START test accepted_values_fct_trips_payment_type__False__0__1__2__3__4__5__6  [RUN]
+14:49:50  25 of 48 START test accepted_values_fct_trips_ratecode_id__False__1__2__3__4__5__6__99  [RUN]
+14:49:51  22 of 48 PASS not_null_dim_zone_location_id .................................... [PASS in 1.83s]
+14:49:51  26 of 48 START test accepted_values_fct_trips_vendor_id__False__1__2__6__7 ..... [RUN]
+14:49:51  23 of 48 PASS unique_dim_zone_location_id ...................................... [PASS in 1.91s]
+14:49:51  27 of 48 START test not_null_fct_trips_do_location_id .......................... [RUN]
+14:49:53  24 of 48 PASS accepted_values_fct_trips_payment_type__False__0__1__2__3__4__5__6  [PASS in 2.16s]
+14:49:53  25 of 48 PASS accepted_values_fct_trips_ratecode_id__False__1__2__3__4__5__6__99  [PASS in 2.16s]
+14:49:53  28 of 48 START test not_null_fct_trips_file_month .............................. [RUN]
+14:49:53  29 of 48 START test not_null_fct_trips_payment_type ............................ [RUN]
+14:49:53  26 of 48 PASS accepted_values_fct_trips_vendor_id__False__1__2__6__7 ........... [PASS in 1.93s]
+14:49:53  30 of 48 START test not_null_fct_trips_pickup_date ............................. [RUN]
+14:49:53  27 of 48 PASS not_null_fct_trips_do_location_id ................................ [PASS in 1.79s]
+14:49:53  31 of 48 START test not_null_fct_trips_pu_location_id .......................... [RUN]
+14:49:54  28 of 48 PASS not_null_fct_trips_file_month .................................... [PASS in 1.80s]
+14:49:54  32 of 48 START test not_null_fct_trips_ratecode_id ............................. [RUN]
+14:49:54  29 of 48 PASS not_null_fct_trips_payment_type .................................. [PASS in 1.88s]
+14:49:54  33 of 48 START test not_null_fct_trips_trip_id ................................. [RUN]
+14:49:55  30 of 48 PASS not_null_fct_trips_pickup_date ................................... [PASS in 1.90s]
+14:49:55  34 of 48 START test not_null_fct_trips_vendor_id ............................... [RUN]
+14:49:55  31 of 48 PASS not_null_fct_trips_pu_location_id ................................ [PASS in 1.84s]
+14:49:55  35 of 48 START test reconcile_months ........................................... [RUN]
+14:49:56  32 of 48 PASS not_null_fct_trips_ratecode_id ................................... [PASS in 1.88s]
+14:49:56  33 of 48 PASS not_null_fct_trips_trip_id ....................................... [PASS in 1.81s]
+14:49:56  36 of 48 START test relationships_fct_trips_do_location_id__location_id__ref_dim_zone_  [RUN]
+14:49:56  37 of 48 START test relationships_fct_trips_payment_type__payment_type__ref_dim_payment_type_  [RUN]
+14:49:56  34 of 48 PASS not_null_fct_trips_vendor_id ..................................... [PASS in 1.87s]
+14:49:56  38 of 48 START test relationships_fct_trips_pickup_date__date_day__ref_dim_date_  [RUN]
+14:49:57  35 of 48 PASS reconcile_months ................................................. [PASS in 2.32s]
+14:49:57  39 of 48 START test relationships_fct_trips_pu_location_id__location_id__ref_dim_zone_  [RUN]
+14:49:58  37 of 48 PASS relationships_fct_trips_payment_type__payment_type__ref_dim_payment_type_  [PASS in 2.08s]
+14:49:58  36 of 48 PASS relationships_fct_trips_do_location_id__location_id__ref_dim_zone_  [PASS in 2.09s]
+14:49:58  40 of 48 START test relationships_fct_trips_ratecode_id__ratecode_id__ref_dim_ratecode_  [RUN]
+14:49:58  41 of 48 START test relationships_fct_trips_vendor_id__vendor_id__ref_dim_vendor_  [RUN]
+14:49:58  38 of 48 PASS relationships_fct_trips_pickup_date__date_day__ref_dim_date_ ..... [PASS in 2.05s]
+14:49:58  42 of 48 START test unique_fct_trips_trip_id ................................... [RUN]
+14:50:00  39 of 48 PASS relationships_fct_trips_pu_location_id__location_id__ref_dim_zone_  [PASS in 2.18s]
+14:50:00  41 of 48 PASS relationships_fct_trips_vendor_id__vendor_id__ref_dim_vendor_ .... [PASS in 2.03s]
+14:50:00  40 of 48 PASS relationships_fct_trips_ratecode_id__ratecode_id__ref_dim_ratecode_  [PASS in 2.09s]
+14:50:01  42 of 48 PASS unique_fct_trips_trip_id ......................................... [PASS in 2.42s]
+14:50:01  43 of 48 START sql table model taxi_gold.mart_daily_zone_demand ................ [RUN]
+14:50:01  44 of 48 START sql table model taxi_gold.mart_hourly_demand .................... [RUN]
+14:50:06  44 of 48 OK created sql table model taxi_gold.mart_hourly_demand ............... [OK in 4.80s]
+14:50:06  45 of 48 START test not_null_mart_hourly_demand_demand_key ..................... [RUN]
+14:50:06  46 of 48 START test unique_mart_hourly_demand_demand_key ....................... [RUN]
+14:50:06  43 of 48 OK created sql table model taxi_gold.mart_daily_zone_demand ........... [OK in 4.81s]
+14:50:06  47 of 48 START test not_null_mart_daily_zone_demand_demand_key ................. [RUN]
+14:50:06  48 of 48 START test unique_mart_daily_zone_demand_demand_key ................... [RUN]
+14:50:08  47 of 48 PASS not_null_mart_daily_zone_demand_demand_key ....................... [PASS in 1.95s]
+14:50:08  45 of 48 PASS not_null_mart_hourly_demand_demand_key ........................... [PASS in 2.00s]
+14:50:08  46 of 48 PASS unique_mart_hourly_demand_demand_key ............................. [PASS in 2.05s]
+14:50:08  48 of 48 PASS unique_mart_daily_zone_demand_demand_key ......................... [PASS in 2.05s]
+14:50:08  
+14:50:08  Finished running 1 incremental model, 4 seeds, 7 table models, 35 data tests, 1 view model in 0 hours 0 minutes and 43.12 seconds (43.12s).
+14:50:08  
+14:50:08  Completed successfully
+14:50:08  
+14:50:08  Done. PASS=48 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=48
+exit=0

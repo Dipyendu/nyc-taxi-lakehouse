@@ -1,0 +1,17 @@
+# Docker build: build context with .dockerignore, healthcheck, relative paths; 2026-11-17 08:34:25 IST
+## Build (plain progress; the 'transferring context' line shows the context size)
+#1 DONE 0.0s
+#2 DONE 0.0s
+#4 DONE 0.0s
+#3 DONE 1.7s
+#5 transferring context: 177B done
+#5 DONE 0.0s
+#6 DONE 0.0s
+#7 transferring context: 74B done
+build exit=0
+## Recreate with healthcheck and relative env_file/QUOTA.log paths, 08:34:34 IST
+ Container taxi-airflow-1 Starting 
+ Container taxi-airflow-1 Started 
+docker health status of taxi-airflow-1 after ~20 s: healthy
+quota log mounted: 2 lines
+token present in container env (value not shown)

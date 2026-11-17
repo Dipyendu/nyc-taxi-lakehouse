@@ -1,0 +1,51 @@
+# Dbt connection test: dbt against the SQL warehouse, 2026-11-16 20:14:13 IST
+## dbt debug
+14:44:14  Running with dbt=1.12.6
+14:44:14  dbt version: 1.12.6
+14:44:14  python version: 3.12.15
+14:44:14  python path: <repo>/.venv/bin/python
+14:44:14  os info: macOS-27.2.1-arm64-arm-64bit
+14:44:16  Using profiles dir at .
+14:44:16  Using profiles.yml file at ./profiles.yml
+14:44:16  Using dbt_project.yml file at <repo>/dbt/dbt_project.yml
+14:44:16  adapter type: databricks
+14:44:16  adapter version: 1.13.0
+14:44:16  Configuration:
+14:44:16    profiles.yml file [OK found and valid]
+14:44:16    dbt_project.yml file [OK found and valid]
+14:44:16  Required dependencies:
+14:44:16   - git [OK found]
+
+14:44:16  Connection:
+14:44:16    host: <workspace-host>
+14:44:16    http_path: /sql/1.0/warehouses/<warehouse-id>   [warehouse id redacted on 17 Nov 2026 before publishing]
+14:44:16    catalog: analytics
+14:44:16    schema: taxi_gold
+14:44:16  Registered adapter: databricks=1.13.0
+14:44:17  Databricks adapter:   SPOG host (host_type='workspace'): no
+14:44:17  Databricks adapter:   workspace_id (from ?o= in http_path): None
+14:44:17  Databricks adapter:   databricks-sql-connector version: 4.4.0 (supported)
+14:44:17  Databricks adapter:   databricks-sdk version: 0.117.0 (supported)
+14:44:22    Connection test: [OK connection ok]
+
+14:44:22  All checks passed!
+exit=0
+## dbt run --select dim_date
+14:44:25  Running with dbt=1.12.6
+14:44:27  Registered adapter: databricks=1.13.0
+14:44:27  Unable to do partial parsing because config vars, config profile, or config target have changed
+14:44:27  Unable to do partial parsing because profile has changed
+14:44:27  Unable to do partial parsing because a project config has changed
+14:44:28  Found 9 models, 35 data tests, 4 seeds, 4 sources, 782 macros
+14:44:28  
+14:44:28  Concurrency: 4 threads (target='dev')
+14:44:28  
+14:44:37  1 of 1 START sql view model taxi_gold.dim_date ................................. [RUN]
+14:44:39  1 of 1 OK created sql view model taxi_gold.dim_date ............................ [OK in 2.11s]
+14:44:39  
+14:44:39  Finished running 1 view model in 0 hours 0 minutes and 11.24 seconds (11.24s).
+14:44:39  
+14:44:39  Completed successfully
+14:44:39  
+14:44:39  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=1
+exit=0

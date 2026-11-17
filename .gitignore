@@ -1,0 +1,24 @@
+# secrets — never committed
+.env*
+*.env
+.databrickscfg
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# local data and build output
+data/
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+.databricks/
+airflow/logs/
+.DS_Store
+dbt/.user.yml

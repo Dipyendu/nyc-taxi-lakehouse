@@ -1,0 +1,51 @@
+# Schema difference from Parquet metadata, generated 2026-11-16 19:46:05 IST
+
+## yellow_tripdata_2024-12.parquet: bytes=61524085 rows=3668371 row_groups=4 columns=19
+   0 VendorID: int32
+   1 tpep_pickup_datetime: timestamp[us]
+   2 tpep_dropoff_datetime: timestamp[us]
+   3 passenger_count: int64
+   4 trip_distance: double
+   5 RatecodeID: int64
+   6 store_and_fwd_flag: large_string
+   7 PULocationID: int32
+   8 DOLocationID: int32
+   9 payment_type: int64
+  10 fare_amount: double
+  11 extra: double
+  12 mta_tax: double
+  13 tip_amount: double
+  14 tolls_amount: double
+  15 improvement_surcharge: double
+  16 total_amount: double
+  17 congestion_surcharge: double
+  18 Airport_fee: double
+
+## yellow_tripdata_2025-01.parquet: bytes=59158238 rows=3475226 row_groups=4 columns=20
+   0 VendorID: int32
+   1 tpep_pickup_datetime: timestamp[us]
+   2 tpep_dropoff_datetime: timestamp[us]
+   3 passenger_count: int64
+   4 trip_distance: double
+   5 RatecodeID: int64
+   6 store_and_fwd_flag: large_string
+   7 PULocationID: int32
+   8 DOLocationID: int32
+   9 payment_type: int64
+  10 fare_amount: double
+  11 extra: double
+  12 mta_tax: double
+  13 tip_amount: double
+  14 tolls_amount: double
+  15 improvement_surcharge: double
+  16 total_amount: double
+  17 congestion_surcharge: double
+  18 Airport_fee: double
+  19 cbd_congestion_fee: double
+
+## Difference (2024-12 -> 2025-01)
+added: [('cbd_congestion_fee', 'double')]
+removed: []
+type changed: []
+case-only renames: []
+order changed among common columns: False

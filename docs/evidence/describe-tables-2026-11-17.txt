@@ -1,0 +1,126 @@
+# DESCRIBE TABLE on the gold tables, silver trips and the ingest manifest, 2026-11-17 10:34 IST (scripts/sql.py via scripts/ledger.sh)
+> DESCRIBE TABLE analytics.taxi_gold.fct_trips
+  col_name | data_type | comment
+  trip_id | string | NULL
+  file_month | string | NULL
+  pickup_date | date | NULL
+  pickup_hour | int | NULL
+  pu_location_id | int | NULL
+  do_location_id | int | NULL
+  vendor_id | int | NULL
+  ratecode_id | int | NULL
+  payment_type | int | NULL
+  passenger_count | int | NULL
+  trip_distance | double | NULL
+  duration_min | decimal(27,6) | NULL
+  fare_amount | double | NULL
+  tip_amount | double | NULL
+  tolls_amount | double | NULL
+  congestion_surcharge | double | NULL
+  airport_fee | double | NULL
+  cbd_congestion_fee | double | NULL
+  total_amount | double | NULL
+  # Partition Information |  | 
+  # col_name | data_type | comment
+  file_month | string | NULL
+> DESCRIBE TABLE analytics.taxi_gold.dim_zone
+  col_name | data_type | comment
+  location_id | int | NULL
+  borough | string | NULL
+  zone | string | NULL
+  service_zone | string | NULL
+  # Clustering Information |  | 
+  # col_name | data_type | comment
+> DESCRIBE TABLE analytics.taxi_gold.dim_date
+  col_name | data_type | comment
+  date_day | date | NULL
+  year | int | NULL
+  month | int | NULL
+  year_month | string | NULL
+  day_of_week | int | NULL
+  day_name | string | NULL
+  is_weekend | boolean | NULL
+  # Clustering Information |  | 
+  # col_name | data_type | comment
+> DESCRIBE TABLE analytics.taxi_gold.dim_vendor
+  col_name | data_type | comment
+  vendor_id | int | NULL
+  vendor_name | string | NULL
+  # Clustering Information |  | 
+  # col_name | data_type | comment
+> DESCRIBE TABLE analytics.taxi_gold.dim_ratecode
+  col_name | data_type | comment
+  ratecode_id | int | NULL
+  ratecode_name | string | NULL
+  # Clustering Information |  | 
+  # col_name | data_type | comment
+> DESCRIBE TABLE analytics.taxi_gold.dim_payment_type
+  col_name | data_type | comment
+  payment_type | int | NULL
+  payment_type_name | string | NULL
+  # Clustering Information |  | 
+  # col_name | data_type | comment
+> DESCRIBE TABLE analytics.taxi_gold.mart_daily_zone_demand
+  col_name | data_type | comment
+  demand_key | string | NULL
+  pickup_date | date | NULL
+  pu_location_id | int | NULL
+  borough | string | NULL
+  zone | string | NULL
+  trips | bigint | NULL
+  gross_total_amount | double | NULL
+  avg_trip_distance | double | NULL
+  # Clustering Information |  | 
+  # col_name | data_type | comment
+> DESCRIBE TABLE analytics.taxi_gold.mart_hourly_demand
+  col_name | data_type | comment
+  demand_key | string | NULL
+  file_month | string | NULL
+  pickup_hour | int | NULL
+  trips | bigint | NULL
+  avg_gross_total_amount | double | NULL
+  avg_duration_min | decimal(24,2) | NULL
+  # Clustering Information |  | 
+  # col_name | data_type | comment
+> DESCRIBE TABLE analytics.taxi_silver.yellow_trips
+  col_name | data_type | comment
+  trip_id | string | NULL
+  file_month | string | NULL
+  vendor_id | int | NULL
+  pickup_ts | timestamp_ntz | NULL
+  dropoff_ts | timestamp_ntz | NULL
+  passenger_count | int | NULL
+  trip_distance | double | NULL
+  ratecode_id | int | NULL
+  store_and_fwd_flag | string | NULL
+  pu_location_id | int | NULL
+  do_location_id | int | NULL
+  payment_type | int | NULL
+  fare_amount | double | NULL
+  extra | double | NULL
+  mta_tax | double | NULL
+  tip_amount | double | NULL
+  tolls_amount | double | NULL
+  improvement_surcharge | double | NULL
+  total_amount | double | NULL
+  congestion_surcharge | double | NULL
+  airport_fee | double | NULL
+  cbd_congestion_fee | double | NULL
+  request_source | string | NULL
+  _source_file | string | NULL
+  _source_row | bigint | NULL
+  _load_ts | timestamp | NULL
+  # Partition Information |  | 
+  # col_name | data_type | comment
+  file_month | string | NULL
+> DESCRIBE TABLE analytics.taxi_bronze.ingest_manifest
+  col_name | data_type | comment
+  file_month | string | NULL
+  file | string | NULL
+  bytes | bigint | NULL
+  rows | bigint | NULL
+  schema_hash | string | NULL
+  schema_json | string | NULL
+  uploaded_at | timestamp | NULL
+  # Clustering Information |  | 
+  # col_name | data_type | comment

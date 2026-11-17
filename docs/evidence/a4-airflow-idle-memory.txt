@@ -1,0 +1,8 @@
+# Airflow stack idle memory, 2026-11-16 20:01:00 IST (docker stats --no-stream)
+## airflow standalone (first try, 19:59 IST): taxi-airflow-1 1.024GiB / 1.25GiB, taxi-postgres-1 48.38MiB / 256MiB
+## lean command (scheduler + api-server + dag-processor, parallelism 1):
+taxi-airflow-1 624MiB / 1.25GiB
+taxi-postgres-1 40.64MiB / 256MiB
+## DAGs:
+dag_id       | fileloc                                | owners  | is_paused | bundle_name | bundle_version
+taxi_monthly | /opt/taxi/airflow/dags/taxi_monthly.py | airflow | True      | dags-folder | None          

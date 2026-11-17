@@ -1,0 +1,20 @@
+version: 2
+sources:
+  - name: bronze
+    description: Raw monthly trip files loaded by jobs/bronze.py, one partition per file month.
+    database: "{{ target.catalog }}"
+    schema: taxi_bronze
+    tables:
+      - name: yellow_trips
+        description: Every source row of every loaded month, source columns as published plus _source_file, _source_row, _load_ts and file_month.
+      - name: ingest_manifest
+        description: One row per landed file with byte size, Parquet footer row count and schema hash.
+  - name: silver
+    description: Typed trips from jobs/silver.py, split by the cleaning rules.
+    database: "{{ target.catalog }}"
+    schema: taxi_silver
+    tables:
+      - name: yellow_trips
+        description: Trips that passed every rule.
+      - name: yellow_trips_quarantine
+        description: Trips that broke a rule, with the first rule they broke in the column rule.

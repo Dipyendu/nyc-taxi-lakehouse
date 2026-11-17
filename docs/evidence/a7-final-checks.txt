@@ -1,0 +1,54 @@
+# Final verification final verification, fresh runs, 2026-11-16 22:54:30 IST
+
+## Acceptance 3 and 4 (warehouse, all months)
+LEDGER: start 2026-11-16 22:54:30, limit 300 s: final verification checks 3 and 4
+> WITH b AS (SELECT file_month, count(*) n FROM analytics.taxi_bronze.yellow_trips GROUP BY 1), s AS (SELECT file_month, count(*) n FROM analytics.taxi_silver.yellow_trips GROUP BY 1), q AS (SELECT file_month, count(*) n FROM analytics.taxi_silver.yellow_trips_quarantine GROUP BY 1), f AS (SELECT file_month, count(*) n FROM analytics.taxi_gold.fct_trips GROUP BY 1) SELECT count(*) AS months, sum(CASE WHEN m.rows = b.n AND b.n = s.n + coalesce(q.n,0) AND f.n = s.n THEN 1 ELSE 0 END) AS months_reconciling, sum(m.rows) AS metadata_rows, sum(b.n) AS bronze, sum(s.n) AS silver, sum(q.n) AS quarantine, sum(f.n) AS fact FROM analytics.taxi_bronze.ingest_manifest m LEFT JOIN b USING (file_month) LEFT JOIN s USING (file_month) LEFT JOIN q USING (file_month) LEFT JOIN f USING (file_month)
+  months | months_reconciling | metadata_rows | bronze | silver | quarantine | fact
+  33 | 33 | 123471721 | 123471721 | 119698837 | 3772884 | 119698837
+> SELECT file_month, count(cbd_congestion_fee) AS cbd_fee_non_null, count(*) AS rows FROM analytics.taxi_bronze.yellow_trips WHERE file_month IN ('2024-12','2025-01') GROUP BY 1 ORDER BY 1
+  file_month | cbd_fee_non_null | rows
+  2024-12 | 0 | 3668371
+  2025-01 | 3475226 | 3475226
+> SELECT file_month, schema_hash FROM analytics.taxi_bronze.ingest_manifest WHERE file_month IN ('2024-12','2025-01') ORDER BY 1
+  file_month | schema_hash
+  2024-12 | 446c654d0c23eb53
+  2025-01 | 351194d0dc1e93c2
+Files: a1-schema-diff-2024-12-vs-2025-01.txt says 2025-01 adds cbd_congestion_fee (double); footer hashes 446c654d0c23eb53 (2024-12) and 351194d0dc1e93c2 (2025-01) in a1-all-months-footer-schemas.txt.
+
+## Acceptance 7: every Databricks job run is in the ledger
+LEDGER: start 2026-11-16 22:54:37, limit 300 s: final verification check 7: list job runs
+Jobs API: taxi_bronze runs=35 success=35
+Jobs API: taxi_silver runs=35 success=35
+ledger rows for job runs: bronze=35 silver=35
+ledger rows without a measured duration: 1 (the 20:10:53 laptop upload of two files, logged after the fact; not a job run)
+ledger rows total: 197
+
+## Acceptance 1: make ci, 22:54:54 IST
+All checks passed!
+33 passed in 1.84s
+17:25:01  dbt parse finished
+make ci exit=0
+
+## Acceptance 6: Airflow run for a month not loaded before, from a clean start
+Not re-run: all 33 published months are now loaded, so no month 'not loaded before' exists. Last passing evidence: docs/evidence/a4-airflow-clean-start-2025-02.txt (run a4_clean_start_2025-02, all five tasks success, 20:24:29 to 20:31:45 IST on 16 Nov 2026). The DAG itself ran 30 more months without failure in the backfill backfill (docs/evidence/a5-backfill-final.txt).
+
+## Acceptance 8: README numbers name their evidence; EXPLAIN complete
+README results rows: 12; rows without an evidence file: 0 []
+EXPLAIN sections: 10 -> ['Source data', 'Ingest (`src/taxi/ingest.py`, `src/taxi/storage.py`)', 'Bronze (`jobs/bronze.py`)', 'Silver and quarantine (`jobs/silver.py`)', 'Gold layer with dbt (`dbt/`)', 'Orchestration with Airflow (`airflow/`)', 'Databricks jobs and deployment (`databricks.yml`)', 'Operations: ledger, quota guard and secrets (`scripts/`)', 'Problems found on the way', 'Likely interview questions']
+EXPLAIN interview questions: 12
+  Ingest: what=True why=True rejected=True at10x=True
+  Bronze: what=True why=True rejected=True at10x=True
+  Silver: what=True why=True rejected=True at10x=True
+  Gold: what=True why=True rejected=True at10x=True
+  Orchestration: what=True why=True rejected=True at10x=True
+  Databricks jobs: what=True why=True rejected=True at10x=False
+
+## Acceptance 9: secret scan, fresh planted proof, 22:55:03 IST
+SECRET-SCAN HIT: databricks-pat in planted_a7.txt
+SECRET-SCAN: FAIL (1 hit(s), all files)
+with plant exit=1
+SECRET-SCAN: CLEAN (all files)
+without plant exit=0
+Fix after this check (22:55:17 IST): added the missing 'At 10x' part to the Databricks jobs section of docs/EXPLAIN.md; re-check: at10x=True
+
+## Acceptance 10, checked 22:55:26 IST right after the last commit of 16 Nov 2026: git status --porcelain lines: 0; git remote count: 0. This line is committed in the next commit; the clean state after that commit is re-checked in the final verification report.

@@ -1,0 +1,107 @@
+# Airflow: Airflow run for 2025-02 (never loaded before) from a clean start, saved 2026-11-16 20:32:36 IST
+Clean start: docker compose -p taxi down -v at 20:23:53 IST (stack and its Postgres volume removed), up -d, DAG registered, then:
+  airflow dags trigger taxi_monthly --conf '{"month": "2025-02"}' --run-id a4_clean_start_2025-02; airflow dags unpause taxi_monthly (20:24:27 IST)
+
+## DAG runs (logical/start times UTC; IST = UTC + 5:30). DAG paused again after the proof.
+dag_id       | run_id                               | state   | run_after                        | logical_date              | start_date                       | end_date                        
+=============+======================================+=========+==================================+===========================+==================================+=================================
+taxi_monthly | a4_clean_start_2025-02               | success | 2026-11-16T14:54:29.791373+00:00 |                           | 2026-11-16T14:54:52.337806+00:00 | 2026-11-16T15:01:45.599581+00:00
+taxi_monthly | scheduled__2026-11-01T00:00:00+00:00 | success | 2026-11-01T00:00:00+00:00        | 2026-11-01T00:00:00+00:00 | 2026-11-16T14:54:32.703323+00:00 | 2026-11-16T14:54:51.290335+00:00
+                                                                                                                                                                                                  
+## Task states, run a4_clean_start_2025-02
+dag_id       | logical_date | task_id   | state   | start_date                       | end_date                        
+=============+==============+===========+=========+==================================+=================================
+taxi_monthly |              | ingest    | success | 2026-11-16T14:54:52.437839+00:00 | 2026-11-16T14:59:43.196035+00:00
+taxi_monthly |              | bronze    | success | 2026-11-16T14:59:43.427496+00:00 | 2026-11-16T15:00:13.513619+00:00
+taxi_monthly |              | silver    | success | 2026-11-16T15:00:14.210190+00:00 | 2026-11-16T15:00:44.016667+00:00
+taxi_monthly |              | dbt_build | success | 2026-11-16T15:00:44.348598+00:00 | 2026-11-16T15:01:32.130189+00:00
+taxi_monthly |              | reconcile | success | 2026-11-16T15:01:32.756885+00:00 | 2026-11-16T15:01:45.332962+00:00
+                                                                                                                       
+## Task states, scheduled run for 2026-11 (unpublished month: ingest exit 99 -> skipped, downstream skipped)
+dag_id       | logical_date              | task_id   | state   | start_date                       | end_date                        
+=============+===========================+===========+=========+==================================+=================================
+taxi_monthly | 2026-11-01T00:00:00+00:00 | ingest    | skipped | 2026-11-16T14:54:32.976522+00:00 | 2026-11-16T14:54:46.809615+00:00
+taxi_monthly | 2026-11-01T00:00:00+00:00 | bronze    | skipped | 2026-11-16T14:54:47.028642+00:00 | 2026-11-16T14:54:47.028642+00:00
+taxi_monthly | 2026-11-01T00:00:00+00:00 | silver    | skipped | 2026-11-16T14:54:48.092707+00:00 | 2026-11-16T14:54:48.092707+00:00
+taxi_monthly | 2026-11-01T00:00:00+00:00 | dbt_build | skipped | 2026-11-16T14:54:49.172372+00:00 | 2026-11-16T14:54:49.172372+00:00
+taxi_monthly | 2026-11-01T00:00:00+00:00 | reconcile | skipped | 2026-11-16T14:54:50.238210+00:00 | 2026-11-16T14:54:50.238210+00:00
+                                                                                                                                    
+## Run-ledger rows for this run
+| 2026-11-16 20:24:35 | airflow ingest 2026-11 (time converted from container UTC) | 1 month | 6 s | SKIP rc=99 (month not published) |
+| 2026-11-16 20:24:52 | airflow ingest 2025-02 (time converted from container UTC) | 1 month | 291 s | OK |
+| 2026-11-16 20:29:43 | airflow bronze 2025-02 (time converted from container UTC) | 1 month | 30 s | OK |
+| 2026-11-16 20:30:14 | airflow silver 2025-02 (time converted from container UTC) | 1 month | 29 s | OK |
+| 2026-11-16 20:30:44 | airflow dbt build 2025-02 (time converted from container UTC) | 1 month | 48 s | OK |
+| 2026-11-16 20:31:32 | airflow dbt reconcile 2025-02 (time converted from container UTC) | 1 month | 13 s | OK |
+
+## Memory, docker stats every ~5 s from 20:24 to 20:32 IST (cap for this project: 1,566 MiB; limits 1,280 MiB airflow + 256 MiB postgres)
+Peak: airflow 1,207 MiB at 20:26:30 IST (during ingest), postgres 103 MiB; host memory free never below 31 %.
+20:24:27 taxi-airflow-1=824.5MiB / 1.25GiB taxi-postgres-1=96.45MiB / 256MiB  32%
+20:24:35 taxi-airflow-1=988.2MiB / 1.25GiB taxi-postgres-1=94MiB / 256MiB  32%
+20:24:42 taxi-airflow-1=1.028GiB / 1.25GiB taxi-postgres-1=94.18MiB / 256MiB  31%
+20:24:49 taxi-airflow-1=951.6MiB / 1.25GiB taxi-postgres-1=95.8MiB / 256MiB  33%
+20:24:55 taxi-airflow-1=1.078GiB / 1.25GiB taxi-postgres-1=95.95MiB / 256MiB  36%
+20:25:02 taxi-airflow-1=1.125GiB / 1.25GiB taxi-postgres-1=96.05MiB / 256MiB  33%
+20:25:09 taxi-airflow-1=1.091GiB / 1.25GiB taxi-postgres-1=96.73MiB / 256MiB  33%
+20:25:16 taxi-airflow-1=1.058GiB / 1.25GiB taxi-postgres-1=96.65MiB / 256MiB  34%
+20:25:23 taxi-airflow-1=1.061GiB / 1.25GiB taxi-postgres-1=96.74MiB / 256MiB  34%
+20:25:30 taxi-airflow-1=1.059GiB / 1.25GiB taxi-postgres-1=96.81MiB / 256MiB  35%
+20:25:37 taxi-airflow-1=1.059GiB / 1.25GiB taxi-postgres-1=96.92MiB / 256MiB  35%
+20:25:43 taxi-airflow-1=1.059GiB / 1.25GiB taxi-postgres-1=97.03MiB / 256MiB  33%
+20:25:50 taxi-airflow-1=1.059GiB / 1.25GiB taxi-postgres-1=97.08MiB / 256MiB  32%
+20:25:57 taxi-airflow-1=1.059GiB / 1.25GiB taxi-postgres-1=96.84MiB / 256MiB  33%
+20:26:03 taxi-airflow-1=1.06GiB / 1.25GiB taxi-postgres-1=96.83MiB / 256MiB  33%
+20:26:10 taxi-airflow-1=1.06GiB / 1.25GiB taxi-postgres-1=96.76MiB / 256MiB  34%
+20:26:17 taxi-airflow-1=1.06GiB / 1.25GiB taxi-postgres-1=97.09MiB / 256MiB  33%
+20:26:23 taxi-airflow-1=1.061GiB / 1.25GiB taxi-postgres-1=102.8MiB / 256MiB  36%
+20:26:30 taxi-airflow-1=1.179GiB / 1.25GiB taxi-postgres-1=96.89MiB / 256MiB  37%
+20:26:37 taxi-airflow-1=1.061GiB / 1.25GiB taxi-postgres-1=97.03MiB / 256MiB  33%
+20:26:44 taxi-airflow-1=1.061GiB / 1.25GiB taxi-postgres-1=96.85MiB / 256MiB  35%
+20:26:51 taxi-airflow-1=1.145GiB / 1.25GiB taxi-postgres-1=96.76MiB / 256MiB  36%
+20:26:58 taxi-airflow-1=1.063GiB / 1.25GiB taxi-postgres-1=97.02MiB / 256MiB  32%
+20:27:05 taxi-airflow-1=1.107GiB / 1.25GiB taxi-postgres-1=97.15MiB / 256MiB  36%
+20:27:12 taxi-airflow-1=1.123GiB / 1.25GiB taxi-postgres-1=96.98MiB / 256MiB  33%
+20:27:19 taxi-airflow-1=889.9MiB / 1.25GiB taxi-postgres-1=96.8MiB / 256MiB  38%
+20:27:26 taxi-airflow-1=891MiB / 1.25GiB taxi-postgres-1=96.87MiB / 256MiB  37%
+20:27:33 taxi-airflow-1=890.7MiB / 1.25GiB taxi-postgres-1=97.1MiB / 256MiB  38%
+20:27:40 taxi-airflow-1=891.6MiB / 1.25GiB taxi-postgres-1=97.11MiB / 256MiB  38%
+20:27:46 taxi-airflow-1=901.7MiB / 1.25GiB taxi-postgres-1=96.95MiB / 256MiB  35%
+20:27:53 taxi-airflow-1=901.7MiB / 1.25GiB taxi-postgres-1=97.09MiB / 256MiB  37%
+20:28:00 taxi-airflow-1=904.9MiB / 1.25GiB taxi-postgres-1=97.23MiB / 256MiB  37%
+20:28:07 taxi-airflow-1=908.2MiB / 1.25GiB taxi-postgres-1=97.02MiB / 256MiB  31%
+20:28:13 taxi-airflow-1=908.2MiB / 1.25GiB taxi-postgres-1=96.81MiB / 256MiB  38%
+20:28:20 taxi-airflow-1=926.6MiB / 1.25GiB taxi-postgres-1=96.91MiB / 256MiB  39%
+20:28:27 taxi-airflow-1=929.3MiB / 1.25GiB taxi-postgres-1=96.89MiB / 256MiB  36%
+20:28:33 taxi-airflow-1=929.3MiB / 1.25GiB taxi-postgres-1=97.13MiB / 256MiB  37%
+20:28:40 taxi-airflow-1=949.9MiB / 1.25GiB taxi-postgres-1=96.99MiB / 256MiB  37%
+20:28:47 taxi-airflow-1=949.8MiB / 1.25GiB taxi-postgres-1=96.76MiB / 256MiB  34%
+20:28:54 taxi-airflow-1=949.6MiB / 1.25GiB taxi-postgres-1=96.94MiB / 256MiB  36%
+20:29:01 taxi-airflow-1=951MiB / 1.25GiB taxi-postgres-1=97.1MiB / 256MiB  36%
+20:29:08 taxi-airflow-1=951MiB / 1.25GiB taxi-postgres-1=97.11MiB / 256MiB  33%
+20:29:14 taxi-airflow-1=950.7MiB / 1.25GiB taxi-postgres-1=97.39MiB / 256MiB  37%
+20:29:20 taxi-airflow-1=950.8MiB / 1.25GiB taxi-postgres-1=96.99MiB / 256MiB  38%
+20:29:26 taxi-airflow-1=950.7MiB / 1.25GiB taxi-postgres-1=97.06MiB / 256MiB  34%
+20:29:33 taxi-airflow-1=950.4MiB / 1.25GiB taxi-postgres-1=97.34MiB / 256MiB  36%
+20:29:40 taxi-airflow-1=950.8MiB / 1.25GiB taxi-postgres-1=97.48MiB / 256MiB  37%
+20:29:47 taxi-airflow-1=908.4MiB / 1.25GiB taxi-postgres-1=97.31MiB / 256MiB  34%
+20:29:54 taxi-airflow-1=908.4MiB / 1.25GiB taxi-postgres-1=97.36MiB / 256MiB  36%
+20:30:00 taxi-airflow-1=908.4MiB / 1.25GiB taxi-postgres-1=97.34MiB / 256MiB  36%
+20:30:07 taxi-airflow-1=908.5MiB / 1.25GiB taxi-postgres-1=97.15MiB / 256MiB  32%
+20:30:13 taxi-airflow-1=905.7MiB / 1.25GiB taxi-postgres-1=97.18MiB / 256MiB  38%
+20:30:20 taxi-airflow-1=906.5MiB / 1.25GiB taxi-postgres-1=97.11MiB / 256MiB  38%
+20:30:26 taxi-airflow-1=972MiB / 1.25GiB taxi-postgres-1=97.48MiB / 256MiB  38%
+20:30:32 taxi-airflow-1=906.9MiB / 1.25GiB taxi-postgres-1=97.52MiB / 256MiB  34%
+20:30:39 taxi-airflow-1=906.7MiB / 1.25GiB taxi-postgres-1=97.27MiB / 256MiB  37%
+20:30:46 taxi-airflow-1=1.095GiB / 1.25GiB taxi-postgres-1=97.11MiB / 256MiB  34%
+20:30:53 taxi-airflow-1=1.153GiB / 1.25GiB taxi-postgres-1=97.43MiB / 256MiB  32%
+20:31:00 taxi-airflow-1=1.162GiB / 1.25GiB taxi-postgres-1=97.23MiB / 256MiB  36%
+20:31:06 taxi-airflow-1=1.174GiB / 1.25GiB taxi-postgres-1=97.64MiB / 256MiB  37%
+20:31:12 taxi-airflow-1=1.123GiB / 1.25GiB taxi-postgres-1=97.39MiB / 256MiB  36%
+20:31:19 taxi-airflow-1=1.142GiB / 1.25GiB taxi-postgres-1=97.31MiB / 256MiB  37%
+20:31:26 taxi-airflow-1=1.151GiB / 1.25GiB taxi-postgres-1=97.24MiB / 256MiB  38%
+20:31:33 taxi-airflow-1=1.117GiB / 1.25GiB taxi-postgres-1=97.33MiB / 256MiB  37%
+20:31:40 taxi-airflow-1=1.141GiB / 1.25GiB taxi-postgres-1=97.14MiB / 256MiB  36%
+20:31:47 taxi-airflow-1=924.8MiB / 1.25GiB taxi-postgres-1=97.45MiB / 256MiB  36%
+20:31:53 taxi-airflow-1=924.8MiB / 1.25GiB taxi-postgres-1=97.46MiB / 256MiB  36%
+20:32:00 taxi-airflow-1=924.8MiB / 1.25GiB taxi-postgres-1=97.1MiB / 256MiB  35%
+20:32:07 taxi-airflow-1=924.8MiB / 1.25GiB taxi-postgres-1=97.4MiB / 256MiB  36%

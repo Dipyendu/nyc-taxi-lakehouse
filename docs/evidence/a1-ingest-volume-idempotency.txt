@@ -1,0 +1,18 @@
+# Ingest ingest to the volume, 2026-11-16 20:10:53 IST
+## first call: make ingest MONTH="2024-12 --to 2025-01"
+{"month": "2024-12", "status": "loaded", "bytes": 61524085, "rows": 3668371}
+{"month": "2025-01", "status": "loaded", "bytes": 59158238, "rows": 3475226}
+exit= (not captured; exit codes re-checked in the section below)
+## second call, same months (must skip, no download or upload)
+{"month": "2024-12", "status": "skipped"}
+{"month": "2025-01", "status": "skipped"}
+exit= (not captured; exit codes re-checked in the section below)
+## unpublished month 2026-10 (expect not_published, exit 99)
+{"month": "2026-10", "status": "not_published", "detail": "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2026-10.parquet -> HTTP 403"}
+exit= (not captured; re-checked below)
+## exit codes, re-checked 2026-11-16 20:12:00 IST (direct command, no make)
+{"month": "2024-12", "status": "skipped"}
+{"month": "2025-01", "status": "skipped"}
+repeat call exit=0
+{"month": "2026-10", "status": "not_published", "detail": "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2026-10.parquet -> HTTP 403"}
+unpublished month exit=99

@@ -1,0 +1,48 @@
+# Footer-only metadata for every month, 2026-11-16 19:48:07 IST (HTTP range requests, no data pages)
+2024-01 bytes=49961641 rows=2964624 cols=19 schema_hash=446c654d0c23eb53
+2024-02 bytes=50349284 rows=3007526 cols=19 schema_hash=446c654d0c23eb53
+2024-03 bytes=60078280 rows=3582628 cols=19 schema_hash=446c654d0c23eb53
+2024-04 bytes=59133625 rows=3514289 cols=19 schema_hash=446c654d0c23eb53
+2024-05 bytes=62553128 rows=3723833 cols=19 schema_hash=446c654d0c23eb53
+2024-06 bytes=59859922 rows=3539193 cols=19 schema_hash=446c654d0c23eb53
+2024-07 bytes=52299432 rows=3076903 cols=19 schema_hash=446c654d0c23eb53
+2024-08 bytes=51067350 rows=2979183 cols=19 schema_hash=446c654d0c23eb53
+2024-09 bytes=61170186 rows=3633030 cols=19 schema_hash=446c654d0c23eb53
+2024-10 bytes=64346071 rows=3833771 cols=19 schema_hash=446c654d0c23eb53
+2024-11 bytes=60658709 rows=3646369 cols=19 schema_hash=446c654d0c23eb53
+2024-12 bytes=61524085 rows=3668371 cols=19 schema_hash=446c654d0c23eb53
+2025-01 bytes=59158238 rows=3475226 cols=20 schema_hash=351194d0dc1e93c2
+2025-02 bytes=60343086 rows=3577543 cols=20 schema_hash=351194d0dc1e93c2
+2025-03 bytes=69964745 rows=4145257 cols=20 schema_hash=351194d0dc1e93c2
+2025-04 bytes=67352824 rows=3970553 cols=20 schema_hash=351194d0dc1e93c2
+2025-05 bytes=77837865 rows=4591845 cols=20 schema_hash=351194d0dc1e93c2
+2025-06 bytes=73542954 rows=4322960 cols=20 schema_hash=351194d0dc1e93c2
+2025-07 bytes=66943728 rows=3898963 cols=20 schema_hash=351194d0dc1e93c2
+2025-08 bytes=62293743 rows=3574091 cols=20 schema_hash=351194d0dc1e93c2
+2025-09 bytes=72432945 rows=4251015 cols=20 schema_hash=351194d0dc1e93c2
+2025-10 bytes=75267589 rows=4428699 cols=20 schema_hash=351194d0dc1e93c2
+2025-11 bytes=71134255 rows=4181444 cols=20 schema_hash=351194d0dc1e93c2
+2025-12 bytes=73701327 rows=4305006 cols=20 schema_hash=351194d0dc1e93c2
+2026-01 bytes=64165080 rows=3724889 cols=20 schema_hash=351194d0dc1e93c2
+2026-02 bytes=58683353 rows=3399866 cols=20 schema_hash=351194d0dc1e93c2
+2026-03 bytes=67891249 rows=3952451 cols=20 schema_hash=351194d0dc1e93c2
+2026-04 bytes=64818115 rows=3831240 cols=20 schema_hash=351194d0dc1e93c2
+2026-05 bytes=69699174 rows=4090836 cols=20 schema_hash=351194d0dc1e93c2
+2026-06 bytes=65465637 rows=3837248 cols=21 schema_hash=3abc68ac85c4aef5
+2026-07 bytes=61685033 rows=3530109 cols=21 schema_hash=3abc68ac85c4aef5
+2026-08 bytes=59043961 rows=3336716 cols=21 schema_hash=3abc68ac85c4aef5
+2026-09 bytes=67374896 rows=3876044 cols=21 schema_hash=3abc68ac85c4aef5
+2026-10 HTTP 403 (not published)
+
+TOTAL rows across published months: 123471721
+
+## 3 distinct schemas
+
+### 446c654d0c23eb53: months 2024-01..2024-12 (12)
+  VendorID:int32, tpep_pickup_datetime:timestamp[us], tpep_dropoff_datetime:timestamp[us], passenger_count:int64, trip_distance:double, RatecodeID:int64, store_and_fwd_flag:large_string, PULocationID:int32, DOLocationID:int32, payment_type:int64, fare_amount:double, extra:double, mta_tax:double, tip_amount:double, tolls_amount:double, improvement_surcharge:double, total_amount:double, congestion_surcharge:double, Airport_fee:double
+
+### 351194d0dc1e93c2: months 2025-01..2026-05 (17)
+  vs first: added [('cbd_congestion_fee', 'double')] removed [] type changed []
+
+### 3abc68ac85c4aef5: months 2026-06..2026-09 (4)
+  vs first: added [('cbd_congestion_fee', 'double'), ('request_source', 'large_string')] removed [] type changed []

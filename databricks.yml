@@ -1,0 +1,62 @@
+# Databricks Asset Bundle: one serverless job per stage (bronze, silver), each run per month.
+# Workspace host and token come from the environment (DATABRICKS_HOST, DATABRICKS_TOKEN).
+# Layout follows the CLI v1.26.0 default-python serverless template.
+bundle:
+  name: nyc_taxi_lakehouse
+
+variables:
+  catalog:
+    description: Unity Catalog catalog. The metastore default `workspace` does not exist in this account (docs/EXPLAIN.md)
+    default: analytics
+  landing_root:
+    description: Landing volume path; passed by the Makefile from LANDING_ROOT in src/taxi/config.py
+
+resources:
+  jobs:
+    taxi_bronze:
+      name: taxi_bronze
+      max_concurrent_runs: 1
+      parameters:
+        - name: month
+          default: "2025-01"
+      tasks:
+        - task_key: bronze
+          spark_python_task:
+            python_file: ./jobs/bronze.py
+            parameters:
+              - "--catalog"
+              - "${var.catalog}"
+              - "--landing-root"
+              - "${var.landing_root}"
+              - "--month"
+              - "{{job.parameters.month}}"
+          environment_key: default
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "5"
+    taxi_silver:
+      name: taxi_silver
+      max_concurrent_runs: 1
+      parameters:
+        - name: month
+          default: "2025-01"
+      tasks:
+        - task_key: silver
+          spark_python_task:
+            python_file: ./jobs/silver.py
+            parameters:
+              - "--catalog"
+              - "${var.catalog}"
+              - "--month"
+              - "{{job.parameters.month}}"
+          environment_key: default
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "5"
+
+targets:
+  dev:
+    mode: development
+    default: true

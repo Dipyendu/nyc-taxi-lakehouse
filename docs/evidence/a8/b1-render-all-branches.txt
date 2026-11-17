@@ -1,0 +1,10 @@
+# Schedule fix: month rendered by the DAG for three real stored runs, one per branch of target_month, 2026-11-17 08:43:48 IST
+Command: airflow tasks render taxi_monthly ingest <run_id> (DAG code at this commit; Airflow passes its real run_type values)
+== backfill__2024-03-01T00:00:00+00:00
+cd /opt/taxi && /opt/taxi/scripts/ledger.sh "airflow ingest 2024-03" "1 month" /opt/taxi-venv/bin/python -m taxi.ingest 2024-03
+== a4_clean_start_2025-02
+cd /opt/taxi && /opt/taxi/scripts/ledger.sh "airflow ingest 2025-02" "1 month" /opt/taxi-venv/bin/python -m taxi.ingest 2025-02
+== scheduled__2026-11-01T00:00:00+00:00
+cd /opt/taxi && /opt/taxi/scripts/ledger.sh "airflow ingest 2026-07" "1 month" /opt/taxi-venv/bin/python -m taxi.ingest 2026-07
+
+Expected: backfill -> month of its logical date (2024-03); manual run with month=2025-02 -> 2025-02; scheduled run of 2026-11-01 -> four months back (2026-07).

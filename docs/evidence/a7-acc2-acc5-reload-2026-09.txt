@@ -1,0 +1,28 @@
+# Final verification acceptance 2 and 5, fresh: reload 2026-09 with make run; counts and checksum before and after; dbt build and reconciliation
+## BEFORE, 2026-11-16 22:51:41 IST
+LEDGER: start 2026-11-16 22:51:41, limit 300 s: final verification snapshot before reload 2026-09
+> SELECT 'bronze' AS layer, count(*) AS rows, sum(cast(xxhash64(`VendorID`, `tpep_pickup_datetime`, `tpep_dropoff_datetime`, `passenger_count`, `trip_distance`, `RatecodeID`, `store_and_fwd_flag`, `PULocationID`, `DOLocationID`, `payment_type`, `fare_amount`, `extra`, `mta_tax`, `tip_amount`, `tolls_amount`, `improvement_surcharge`, `total_amount`, `congestion_surcharge`, `Airport_fee`, `cbd_congestion_fee`, `_source_file`, `_source_row`, `file_month`, `request_source`) AS DECIMAL(38,0))) AS checksum FROM analytics.taxi_bronze.yellow_trips WHERE file_month = '2026-09'
+  layer | rows | checksum
+  bronze | 3876044 | 1496865884042246289199
+> SELECT 'fact' AS layer, count(*) AS rows, sum(cast(xxhash64(*) AS DECIMAL(38,0))) AS checksum FROM analytics.taxi_gold.fct_trips WHERE file_month = '2026-09'
+  layer | rows | checksum
+  fact | 3861245 | -9889572806665539712617
+## RELOAD make run MONTH=2026-09, 2026-11-16 22:51:51 IST
+{"month": "2026-09", "status": "skipped"}
+[22:52:24] taxi_bronze month=2026-09 job_id=610188567750162 run_id=804171279725103 result=SUCCESS
+[22:52:53] taxi_silver month=2026-09 job_id=817405865672281 run_id=370148297178747 result=SUCCESS
+17:23:47  Finished running 1 incremental model, 4 seeds, 7 table models, 34 data tests, 1 view model in 0 hours 0 minutes and 49.43 seconds (49.43s).
+17:23:47  Completed successfully
+17:23:47  Done. PASS=47 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=47
+17:24:02  Finished running 1 test in 0 hours 0 minutes and 7.85 seconds (7.85s).
+17:24:02  Completed successfully
+17:24:02  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=1
+make run exit=0
+## AFTER, 2026-11-16 22:54:03 IST
+LEDGER: start 2026-11-16 22:54:03, limit 300 s: final verification snapshot after reload 2026-09
+> SELECT 'bronze' AS layer, count(*) AS rows, sum(cast(xxhash64(`VendorID`, `tpep_pickup_datetime`, `tpep_dropoff_datetime`, `passenger_count`, `trip_distance`, `RatecodeID`, `store_and_fwd_flag`, `PULocationID`, `DOLocationID`, `payment_type`, `fare_amount`, `extra`, `mta_tax`, `tip_amount`, `tolls_amount`, `improvement_surcharge`, `total_amount`, `congestion_surcharge`, `Airport_fee`, `cbd_congestion_fee`, `_source_file`, `_source_row`, `file_month`, `request_source`) AS DECIMAL(38,0))) AS checksum FROM analytics.taxi_bronze.yellow_trips WHERE file_month = '2026-09'
+  layer | rows | checksum
+  bronze | 3876044 | 1496865884042246289199
+> SELECT 'fact' AS layer, count(*) AS rows, sum(cast(xxhash64(*) AS DECIMAL(38,0))) AS checksum FROM analytics.taxi_gold.fct_trips WHERE file_month = '2026-09'
+  layer | rows | checksum
+  fact | 3861245 | -9889572806665539712617
