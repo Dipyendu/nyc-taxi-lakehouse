@@ -101,7 +101,7 @@ Every Databricks job run, dbt build or test, ingest and deploy started from `mak
 - Files are downloaded on the laptop or in the Airflow container and uploaded to a volume, because Free Edition restricts outbound internet access from Databricks to a limited set of trusted domains. An S3 landing zone was planned as an optional upgrade and not built.
 - Airflow runs as one container with parallelism 1, sized for an 8 GB laptop shared with another project. It is a local demonstration, not a highly available deployment. The Airflow UI has no login (it is bound to 127.0.0.1 only), and the container receives the Databricks token through its environment. A healthcheck marks the container unhealthy if the API server, scheduler or DAG processor stops, but nothing restarts them.
 - The marts are rebuilt in full on every `dbt build`; only the fact table is incremental.
-- The GitHub Actions workflow (`.github/workflows/ci.yml`) runs the same steps as `make ci`, which passes locally, and then the secret scan over every file. It has not yet run on GitHub, because the repository has not been pushed.
+- The GitHub Actions workflow (`.github/workflows/ci.yml`) runs the same steps as `make ci`, which passes locally, and then the secret scan over every file. It runs on every push and pull request; its first run on GitHub, on 17 Nov 2026, passed (see the repository's Actions tab).
 - The workspace's default catalog `workspace` does not exist in the account used here; all objects live in the `analytics` catalog under `taxi_*` schemas.
 
 ## Known limits

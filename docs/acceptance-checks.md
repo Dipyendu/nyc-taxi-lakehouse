@@ -13,4 +13,4 @@ The project is done when all ten checks pass. Evidence files with "acceptance" o
 | 7 | The run ledger lists every Databricks job run with its duration. | `docs/evidence/a8/acceptance-fresh.txt`, `docs/run-ledger.md` |
 | 8 | Every number in the README names its evidence file, and `docs/EXPLAIN.md` is complete. | `docs/evidence/a8/acceptance-fresh.txt` |
 | 9 | The secret scan is clean, and it is proven to find a planted fake secret. | `docs/evidence/a8/acceptance-fresh.txt`, `docs/evidence/a0-secret-scan-proof.txt` |
-| 10 | All work is committed, the working tree is clean, and no remote is configured. | `git status`, `git remote` |
+| 10 | All work is committed, the working tree is clean, and the local `main` equals `main` on GitHub. | `git status`, `git rev-parse main origin/main` after `git fetch` |
